@@ -77,6 +77,7 @@ export type Database = {
           changelog: string | null
           created_at: string
           custom_stats: Json
+          difficulty: number | null
           gallery: Json
           id: string
           items: Json
@@ -98,6 +99,7 @@ export type Database = {
           changelog?: string | null
           created_at?: string
           custom_stats?: Json
+          difficulty?: number | null
           gallery?: Json
           id?: string
           items?: Json
@@ -119,6 +121,7 @@ export type Database = {
           changelog?: string | null
           created_at?: string
           custom_stats?: Json
+          difficulty?: number | null
           gallery?: Json
           id?: string
           items?: Json

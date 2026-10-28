@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ImagePlus, Trash2, Plus, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  ABILITY_FIELDS, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
+  ABILITY_FIELDS, DIFFICULTY_OPTIONS, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
   type Ability, type Character, type Counter, type CustomStat, type Item, type Slot,
 } from "@/lib/moba";
 import { MediaImage } from "./MediaImage";

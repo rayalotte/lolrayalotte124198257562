@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ABILITY_FIELDS, SLOTS, SLOT_LABEL, STAT_KEYS, characterDetailQuery,
   type Ability, type Character, type Slot,
@@ -84,10 +84,10 @@ export function CharacterView({ character: c, all }: { character: Character; all
 }
 
 function Loading() { return <div className="h-24 animate-pulse bg-muted" />; }
-function Empty({ children }: { children: React.ReactNode }) {
+function Empty({ children }: { children: ReactNode }) {
   return <div className="border border-dashed px-6 py-10 text-center text-sm text-muted-foreground">{children}</div>;
 }
-function Heading({ children }: { children: React.ReactNode }) {
+function Heading({ children }: { children: ReactNode }) {
   return <h2 className="label-caps mb-4 text-primary">{children}</h2>;
 }
 

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ImagePlus, Trash2, Plus, RefreshCw, Crop } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  ABILITY_FIELDS, DIFFICULTY_OPTIONS, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
+  ABILITY_FIELDS, DIFFICULTY_OPTIONS, MAX_BYTES, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
   type Ability, type Character, type Counter, type CustomStat, type Item, type Slot,
 } from "@/lib/moba";
 import { MediaImage } from "./MediaImage";
@@ -34,6 +34,7 @@ function ImageField({ label, value, onChange, aspect, cropAspect, hint }: { labe
     setCropSrc(URL.createObjectURL(f));
   };
   const applyCrop = (file: File) => {
+    if (file.size > MAX_BYTES) { setErr("O recorte ficou grande demais (máximo 8 MB). Tente um zoom maior ou outra imagem."); cancelCrop(); return; }
     if (value.preview) URL.revokeObjectURL(value.preview);
     if (value.orig && value.orig !== cropSrc) URL.revokeObjectURL(value.orig);
     onChange({ path: null, file, preview: URL.createObjectURL(file), orig: cropSrc });

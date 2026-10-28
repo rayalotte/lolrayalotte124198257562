@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode, type FormEvent } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -54,7 +54,7 @@ function AdminLayout() {
   return <Shell email={session.user.email}><Outlet /></Shell>;
 }
 
-function Shell({ email, children }: { email?: string; children: React.ReactNode }) {
+function Shell({ email, children }: { email?: string; children: ReactNode }) {
   return (
     <div className="min-h-screen">
       <header className="flex items-center justify-between border-b bg-panel px-5 py-3">
@@ -76,7 +76,7 @@ function AuthForm() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
     setBusy(true);
     try {

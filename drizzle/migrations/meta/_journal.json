@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793189533357,
+      "tag": "0000_moba_schema",
+      "breakpoints": true
+    }
+  ]
 }

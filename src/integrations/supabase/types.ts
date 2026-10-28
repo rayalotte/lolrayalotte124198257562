@@ -14,16 +14,200 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      abilities: {
+        Row: {
+          character_id: string
+          cooldown: string | null
+          cost: string | null
+          damage: string | null
+          description: string | null
+          duration: string | null
+          effects: string | null
+          icon_url: string | null
+          id: string
+          name: string | null
+          notes: string | null
+          range: string | null
+          slot: string
+        }
+        Insert: {
+          character_id: string
+          cooldown?: string | null
+          cost?: string | null
+          damage?: string | null
+          description?: string | null
+          duration?: string | null
+          effects?: string | null
+          icon_url?: string | null
+          id?: string
+          name?: string | null
+          notes?: string | null
+          range?: string | null
+          slot: string
+        }
+        Update: {
+          character_id?: string
+          cooldown?: string | null
+          cost?: string | null
+          damage?: string | null
+          description?: string | null
+          duration?: string | null
+          effects?: string | null
+          icon_url?: string | null
+          id?: string
+          name?: string | null
+          notes?: string | null
+          range?: string | null
+          slot?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "abilities_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "characters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      characters: {
+        Row: {
+          art_url: string | null
+          biography: string | null
+          changelog: string | null
+          created_at: string
+          custom_stats: Json
+          gallery: Json
+          id: string
+          items: Json
+          lanes: string[]
+          name: string
+          notes: string | null
+          portrait_url: string | null
+          role: string | null
+          short_description: string | null
+          slug: string
+          stats: Json
+          tags: string[]
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          art_url?: string | null
+          biography?: string | null
+          changelog?: string | null
+          created_at?: string
+          custom_stats?: Json
+          gallery?: Json
+          id?: string
+          items?: Json
+          lanes?: string[]
+          name: string
+          notes?: string | null
+          portrait_url?: string | null
+          role?: string | null
+          short_description?: string | null
+          slug: string
+          stats?: Json
+          tags?: string[]
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          art_url?: string | null
+          biography?: string | null
+          changelog?: string | null
+          created_at?: string
+          custom_stats?: Json
+          gallery?: Json
+          id?: string
+          items?: Json
+          lanes?: string[]
+          name?: string
+          notes?: string | null
+          portrait_url?: string | null
+          role?: string | null
+          short_description?: string | null
+          slug?: string
+          stats?: Json
+          tags?: string[]
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      counters: {
+        Row: {
+          character_id: string
+          id: string
+          kind: string
+          note: string | null
+          target_id: string
+        }
+        Insert: {
+          character_id: string
+          id?: string
+          kind: string
+          note?: string | null
+          target_id: string
+        }
+        Update: {
+          character_id?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          target_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "counters_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "counters_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "characters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +334,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

@@ -15,6 +15,13 @@
       "when": 1793191185314,
       "tag": "0001_add_character_difficulty",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793191367509,
+      "tag": "0002_difficulty_muito_dificil",
+      "breakpoints": true
     }
   ]
 }

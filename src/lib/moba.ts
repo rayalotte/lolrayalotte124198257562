@@ -44,8 +44,9 @@ export const DIFFICULTY_OPTIONS = [
   { value: 1, label: "Fácil" },
   { value: 2, label: "Média" },
   { value: 3, label: "Difícil" },
+  { value: 4, label: "Muito difícil" },
 ] as const;
-export const DIFFICULTY_LABEL: Record<number, string> = { 1: "Fácil", 2: "Média", 3: "Difícil" };
+export const DIFFICULTY_LABEL: Record<number, string> = { 1: "Fácil", 2: "Média", 3: "Difícil", 4: "Muito difícil" };
 
 export type Character = {
   id: string;

@@ -29,6 +29,7 @@ export type Database = {
           notes: string | null
           range: string | null
           slot: string
+          target: string | null
         }
         Insert: {
           character_id: string
@@ -44,6 +45,7 @@ export type Database = {
           notes?: string | null
           range?: string | null
           slot: string
+          target?: string | null
         }
         Update: {
           character_id?: string
@@ -59,6 +61,7 @@ export type Database = {
           notes?: string | null
           range?: string | null
           slot?: string
+          target?: string | null
         }
         Relationships: [
           {

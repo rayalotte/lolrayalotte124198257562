@@ -54,7 +54,7 @@ function ImageField({ label, value, onChange, aspect, hint }: { label: string; v
 }
 
 /* ---------- small inputs ---------- */
-function Field({ label, children, error }: { label: string; children: ReactNode; error?: string }) {
+function Field({ label, children, error }: { label: string; children: ReactNode; error?: string | undefined }) {
   return <div className="space-y-1.5"><Label>{label}</Label>{children}{error && <p className="text-xs text-destructive">{error}</p>}</div>;
 }
 const csv = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
@@ -145,7 +145,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
       }
       if (keep.length) {
         const u = await supabase.from("abilities").upsert(keep.map(({ a, icon }) => ({
-          character_id: id, slot: a.slot, name: a.name || null, icon_url: icon, description: a.description || null,
+          character_id: id, slot: a.slot, name: a.name || null, icon_url: icon ?? null, description: a.description || null,
           damage: a.damage || null, range: a.range || null, duration: a.duration || null, cooldown: a.cooldown || null,
           cost: a.cost || null, effects: a.effects || null, notes: a.notes || null,
         })), { onConflict: "character_id,slot" });
@@ -196,7 +196,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
 
         <TabsContent value="basic" className="mt-6 space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Nome *" error={errors.name}><Input value={f.name} onChange={set("name")} aria-invalid={!!errors.name} /></Field>
+            <Field label="Nome *" error={errors["name"]}><Input value={f.name} onChange={set("name")} aria-invalid={!!errors["name"]} /></Field>
             <Field label="Título / apelido"><Input value={f.title} onChange={set("title")} /></Field>
             <Field label="Função principal"><Input value={f.role} onChange={set("role")} placeholder="ex.: Assassino" /></Field>
             <Field label="Rotas (separe por vírgula)"><Input value={f.lanes} onChange={set("lanes")} placeholder="ex.: Topo, Selva" /></Field>

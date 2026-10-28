@@ -54,7 +54,7 @@ function AdminLayout() {
   return <Shell email={session.user.email}><Outlet /></Shell>;
 }
 
-function Shell({ email, children }: { email?: string; children: ReactNode }) {
+function Shell({ email, children }: { email?: string | undefined; children: ReactNode }) {
   return (
     <div className="min-h-screen">
       <header className="flex items-center justify-between border-b bg-panel px-5 py-3">

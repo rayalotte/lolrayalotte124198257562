@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
-import { ImagePlus, Trash2, Plus, RefreshCw } from "lucide-react";
+import { ImagePlus, Trash2, Plus, RefreshCw, Crop } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ABILITY_FIELDS, DIFFICULTY_OPTIONS, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,

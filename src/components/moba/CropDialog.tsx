@@ -48,8 +48,7 @@ export function CropDialog({
     if (!area) return;
     setBusy(true);
     try {
-      const type = src.startsWith("blob:") ? "image/png" : "image/png";
-      onDone(await cropToFile(src, area, type));
+      onDone(await cropToFile(src, area, "image/png"));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Falha ao cortar a imagem.");
     } finally {

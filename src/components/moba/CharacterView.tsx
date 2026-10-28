@@ -118,7 +118,7 @@ function AbilityBar({ abilities, active, onPick }: { abilities: Ability[]; activ
 
 function AbilitiesTab({ abilities, slot, setSlot }: { abilities: Ability[]; slot: Slot | null; setSlot: (s: Slot) => void }) {
   if (!abilities.length) return <Empty>Nenhuma habilidade cadastrada para este herói.</Empty>;
-  const current = slot ?? abilities.find((a) => a.slot === "P")?.slot ?? abilities[0].slot;
+  const current = slot ?? abilities.find((a) => a.slot === "P")?.slot ?? abilities[0]?.slot ?? "P";
   const a = abilities.find((x) => x.slot === current);
   return (
     <div className="grid gap-6 md:grid-cols-[auto_1fr]">

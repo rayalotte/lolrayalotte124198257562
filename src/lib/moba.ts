@@ -58,6 +58,7 @@ export type Character = {
   custom_stats: CustomStat[];
   items: Item[];
   changelog: string | null;
+  difficulty: number | null;
   created_at: string;
 };
 export type Counter = { id?: string; character_id: string; target_id: string; kind: "strong" | "weak"; note: string | null };

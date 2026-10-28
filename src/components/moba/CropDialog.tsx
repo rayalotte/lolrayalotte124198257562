@@ -75,7 +75,7 @@ export function CropDialog({
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted-foreground">Zoom</span>
-          <Slider value={[zoom]} min={1} max={4} step={0.05} onValueChange={([v]) => setZoom(v)} className="flex-1" />
+          <Slider value={[zoom]} min={1} max={4} step={0.05} onValueChange={(v) => setZoom(v[0] ?? 1)} className="flex-1" />
         </div>
         <p className="text-xs text-muted-foreground">Arraste a imagem e ajuste o zoom para escolher o trecho que preenche o espaço no site.</p>
         <DialogFooter>

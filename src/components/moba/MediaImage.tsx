@@ -1,6 +1,6 @@
 import { useMediaUrl } from "@/lib/moba";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 export function MediaImage({
   path,
@@ -12,7 +12,7 @@ export function MediaImage({
   path: string | null | undefined;
   alt: string;
   className?: string;
-  fallback?: React.ReactNode;
+  fallback?: ReactNode;
   eager?: boolean;
 }) {
   const url = useMediaUrl(path);

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
-  ABILITY_FIELDS, SLOTS, SLOT_LABEL, STAT_KEYS, characterDetailQuery,
+  ABILITY_FIELDS, DIFFICULTY_LABEL, SLOTS, SLOT_LABEL, STAT_KEYS, characterDetailQuery,
   type Ability, type Character, type Slot,
 } from "@/lib/moba";
 import { MediaImage, Monogram } from "./MediaImage";
@@ -41,6 +41,7 @@ export function CharacterView({ character: c, all }: { character: Character; all
             {c.role && <div className="label-caps mb-2 text-primary">{c.role}</div>}
             <h1 className="font-display text-5xl font-bold uppercase leading-[0.9] tracking-wide md:text-7xl">{c.name}</h1>
             {c.title && <p className="mt-2 font-display text-lg text-muted-foreground md:text-xl">{c.title}</p>}
+            {c.difficulty != null && <DifficultyPips level={c.difficulty} label="Dificuldade" className="mt-2" />}
             {(c.lanes.length > 0 || c.tags.length > 0) && (
               <div className="mt-4 flex flex-wrap gap-1.5">
                 {c.lanes.map((l) => <span key={l} className="border border-primary/50 bg-background/60 px-2 py-0.5 text-xs text-primary">{l}</span>)}
@@ -84,6 +85,20 @@ export function CharacterView({ character: c, all }: { character: Character; all
 }
 
 function Loading() { return <div className="h-24 animate-pulse bg-muted" />; }
+
+function DifficultyPips({ level, label, className }: { level: number; label?: string; className?: string }) {
+  return (
+    <span className={cn("flex items-center gap-2", className)}>
+      {label && <span className="label-caps text-muted-foreground">{label}</span>}
+      <span className="flex gap-1">
+        {[1, 2, 3].map((i) => (
+          <span key={i} className={cn("h-1.5 w-6", i <= level ? "bg-primary" : "bg-border")} />
+        ))}
+      </span>
+      <span className="text-xs text-muted-foreground">{DIFFICULTY_LABEL[level]}</span>
+    </span>
+  );
+}
 function Empty({ children }: { children: ReactNode }) {
   return <div className="border border-dashed px-6 py-10 text-center text-sm text-muted-foreground">{children}</div>;
 }
@@ -173,7 +188,7 @@ function Block({ title, text }: { title: string; text: string }) {
 }
 
 function Overview({ c }: { c: Character }) {
-  const rows = [["Nome", c.name], ["Título", c.title], ["Função", c.role], ["Rotas", c.lanes.join(", ")]].filter(([, v]) => v);
+  const rows = [["Nome", c.name], ["Título", c.title], ["Função", c.role], ["Rotas", c.lanes.join(", ")], ["Dificuldade", c.difficulty ? DIFFICULTY_LABEL[c.difficulty] : ""]].filter(([, v]) => v);
   return (
     <div className="grid gap-8 md:grid-cols-[1fr_260px]">
       <div>

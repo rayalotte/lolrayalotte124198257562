@@ -40,6 +40,13 @@ export const ABILITY_FIELDS = [
 export type Item = { name: string; note?: string };
 export type CustomStat = { label: string; value: string };
 
+export const DIFFICULTY_OPTIONS = [
+  { value: 1, label: "Fácil" },
+  { value: 2, label: "Média" },
+  { value: 3, label: "Difícil" },
+] as const;
+export const DIFFICULTY_LABEL: Record<number, string> = { 1: "Fácil", 2: "Média", 3: "Difícil" };
+
 export type Character = {
   id: string;
   slug: string;
@@ -58,6 +65,7 @@ export type Character = {
   custom_stats: CustomStat[];
   items: Item[];
   changelog: string | null;
+  difficulty: number | null;
   created_at: string;
 };
 export type Counter = { id?: string; character_id: string; target_id: string; kind: "strong" | "weak"; note: string | null };

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ImagePlus, Trash2, Plus, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  ABILITY_FIELDS, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
+  ABILITY_FIELDS, DIFFICULTY_OPTIONS, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
   type Ability, type Character, type Counter, type CustomStat, type Item, type Slot,
 } from "@/lib/moba";
 import { MediaImage } from "./MediaImage";
@@ -79,6 +79,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
   const [stats, setStats] = useState<Record<string, string>>(initial?.stats ?? {});
   const [custom, setCustom] = useState<CustomStat[]>(initial?.custom_stats ?? []);
   const [items, setItems] = useState<Item[]>(initial?.items ?? []);
+  const [difficulty, setDifficulty] = useState<number | null>(initial?.difficulty ?? null);
   const [abs, setAbs] = useState<AbForm[]>(SLOTS.map((s) => {
     const a = abilities.find((x) => x.slot === s);
     if (!a) return emptyAb(s);
@@ -127,6 +128,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
         notes: f.notes || null, changelog: f.changelog || null, portrait_url: portraitPath, art_url: artPath,
         gallery: galleryPaths, stats: Object.fromEntries(Object.entries(stats).filter(([, v]) => v?.trim())),
         custom_stats: custom.filter((c) => c.label.trim()), items: items.filter((i) => i.name.trim()),
+        difficulty,
         updated_at: new Date().toISOString(),
       };
       const res = initial
@@ -201,6 +203,17 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
             <Field label="Função principal"><Input value={f.role} onChange={set("role")} placeholder="ex.: Assassino" /></Field>
             <Field label="Rotas (separe por vírgula)"><Input value={f.lanes} onChange={set("lanes")} placeholder="ex.: Topo, Selva" /></Field>
           </div>
+          <Field label="Dificuldade">
+            <div className="flex flex-wrap items-center gap-2">
+              {DIFFICULTY_OPTIONS.map((d) => (
+                <button key={d.value} type="button" onClick={() => setDifficulty((p) => (p === d.value ? null : d.value))}
+                  className={cn("border px-4 py-2 font-display text-sm transition-colors", difficulty === d.value ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary/60")}>
+                  {d.label}
+                </button>
+              ))}
+              {difficulty != null && <Button type="button" variant="ghost" size="sm" onClick={() => setDifficulty(null)}>Limpar</Button>}
+            </div>
+          </Field>
           <Field label="Tags (separe por vírgula)"><Input value={f.tags} onChange={set("tags")} /></Field>
           <Field label="Descrição curta"><Textarea rows={3} value={f.short_description} onChange={set("short_description")} /></Field>
           <Field label="Biografia / história"><Textarea rows={7} value={f.biography} onChange={set("biography")} /></Field>

@@ -97,7 +97,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
 
   const save = async () => {
     const errs: Record<string, string> = {};
-    if (!f.name.trim()) errs.name = "O nome é obrigatório.";
+    if (!f.name.trim()) errs["name"] = "O nome é obrigatório.";
     setErrors(errs);
     if (Object.keys(errs).length) { setTab("basic"); toast.error("Corrija os campos destacados."); return; }
     setSaving(true);

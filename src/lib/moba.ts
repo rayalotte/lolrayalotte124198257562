@@ -21,6 +21,7 @@ export type Ability = {
   name: string | null;
   icon_url: string | null;
   description: string | null;
+  target: string | null;
   damage: string | null;
   range: string | null;
   duration: string | null;
@@ -30,6 +31,7 @@ export type Ability = {
   notes: string | null;
 };
 export const ABILITY_FIELDS = [
+  ["target", "Alvo"],
   ["damage", "Dano"],
   ["range", "Alcance"],
   ["duration", "Duração"],

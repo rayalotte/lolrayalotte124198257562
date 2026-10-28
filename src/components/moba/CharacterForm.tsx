@@ -9,6 +9,7 @@ import {
   type Ability, type Character, type Counter, type CustomStat, type Item, type Slot,
 } from "@/lib/moba";
 import { MediaImage } from "./MediaImage";
+import { CropDialog } from "./CropDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -104,7 +105,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
   const [tab, setTab] = useState("basic");
   const [slot, setSlot] = useState<Slot>("P");
 
-  useEffect(() => () => { [portrait, art, ...gallery, ...abs.map((a) => a.icon)].forEach((i) => i.preview && URL.revokeObjectURL(i.preview)); }, []); // eslint-disable-line
+  useEffect(() => () => { [portrait, art, ...gallery, ...abs.map((a) => a.icon)].forEach((i) => { if (i.preview) URL.revokeObjectURL(i.preview); if (i.orig) URL.revokeObjectURL(i.orig); }); }, []); // eslint-disable-line
 
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF((p) => ({ ...p, [k]: e.target.value }));
   const setAb = (s: Slot, patch: Partial<AbForm>) => setAbs((p) => p.map((a) => (a.slot === s ? { ...a, ...patch } : a)));

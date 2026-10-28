@@ -17,26 +17,37 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 /* ---------- image picker ---------- */
-type Img = { path: string | null; file: File | null; preview: string | null };
-const img = (path: string | null): Img => ({ path, file: null, preview: null });
+type Img = { path: string | null; file: File | null; preview: string | null; orig: string | null };
+const img = (path: string | null): Img => ({ path, file: null, preview: null, orig: null });
 
-function ImageField({ label, value, onChange, aspect, hint }: { label: string; value: Img; onChange: (v: Img) => void; aspect: string; hint?: string }) {
+function ImageField({ label, value, onChange, aspect, cropAspect, hint }: { label: string; value: Img; onChange: (v: Img) => void; aspect: string; cropAspect: number; hint?: string }) {
   const ref = useRef<HTMLInputElement>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const has = value.preview || value.path;
   const pick = (f?: File) => {
     if (!f) return;
     const e = validateImage(f);
     if (e) { setErr(e); return; }
     setErr(null);
-    onChange({ ...value, file: f, preview: URL.createObjectURL(f) });
+    setCropSrc(URL.createObjectURL(f));
+  };
+  const applyCrop = (file: File) => {
+    if (value.preview) URL.revokeObjectURL(value.preview);
+    if (value.orig && value.orig !== cropSrc) URL.revokeObjectURL(value.orig);
+    onChange({ path: null, file, preview: URL.createObjectURL(file), orig: cropSrc });
+    setCropSrc(null);
+  };
+  const cancelCrop = () => {
+    if (cropSrc && cropSrc !== value.orig) URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
   };
   return (
     <div>
       <Label className="mb-1.5 block">{label}</Label>
       <div className={cn("relative overflow-hidden border border-dashed bg-panel-raised", aspect)}>
-        {value.preview ? <img src={value.preview} alt="" className="size-full object-contain" />
-          : value.path ? <MediaImage path={value.path} alt="" className="size-full object-contain" />
+        {value.preview ? <img src={value.preview} alt="" className="size-full object-cover" />
+          : value.path ? <MediaImage path={value.path} alt="" className="size-full object-cover" />
           : <button type="button" onClick={() => ref.current?.click()} className="flex size-full flex-col items-center justify-center gap-1 text-xs text-muted-foreground hover:text-primary"><ImagePlus className="size-6" />Selecionar imagem</button>}
         {value.file && <span className="absolute left-1 top-1 bg-primary px-1.5 text-[10px] text-primary-foreground">não salva</span>}
       </div>
@@ -44,11 +55,13 @@ function ImageField({ label, value, onChange, aspect, hint }: { label: string; v
       {has && (
         <div className="mt-1.5 flex gap-1">
           <Button type="button" size="sm" variant="outline" onClick={() => ref.current?.click()}><RefreshCw className="size-3" />Trocar</Button>
-          <Button type="button" size="sm" variant="ghost" onClick={() => onChange({ path: null, file: null, preview: null })}><Trash2 className="size-3" />Remover</Button>
+          {value.orig && <Button type="button" size="sm" variant="outline" onClick={() => setCropSrc(value.orig)}><Crop className="size-3" />Recortar</Button>}
+          <Button type="button" size="sm" variant="ghost" onClick={() => onChange({ path: null, file: null, preview: null, orig: null })}><Trash2 className="size-3" />Remover</Button>
         </div>
       )}
       {hint && !err && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
       {err && <p className="mt-1 text-xs text-destructive">{err}</p>}
+      {cropSrc && <CropDialog src={cropSrc} aspect={cropAspect} title={`Recortar — ${label}`} onCancel={cancelCrop} onDone={applyCrop} />}
     </div>
   );
 }

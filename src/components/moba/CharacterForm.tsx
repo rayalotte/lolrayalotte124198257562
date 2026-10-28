@@ -60,7 +60,7 @@ function Field({ label, children, error }: { label: string; children: ReactNode;
 const csv = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
 
 type AbForm = Omit<Ability, "icon_url" | "slot"> & { slot: Slot; icon: Img };
-const emptyAb = (slot: Slot): AbForm => ({ slot, name: "", description: "", damage: "", range: "", duration: "", cooldown: "", cost: "", effects: "", notes: "", icon: img(null) });
+const emptyAb = (slot: Slot): AbForm => ({ slot, name: "", description: "", target: "", damage: "", range: "", duration: "", cooldown: "", cost: "", effects: "", notes: "", icon: img(null) });
 
 export function CharacterForm({ initial, abilities = [], counters = [] }: { initial?: Character; abilities?: Ability[]; counters?: Counter[] }) {
   const navigate = useNavigate();
@@ -148,8 +148,8 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
       if (keep.length) {
         const u = await supabase.from("abilities").upsert(keep.map(({ a, icon }) => ({
           character_id: id, slot: a.slot, name: a.name || null, icon_url: icon ?? null, description: a.description || null,
-          damage: a.damage || null, range: a.range || null, duration: a.duration || null, cooldown: a.cooldown || null,
-          cost: a.cost || null, effects: a.effects || null, notes: a.notes || null,
+          target: a.target || null, damage: a.damage || null, range: a.range || null, duration: a.duration || null,
+          cooldown: a.cooldown || null, cost: a.cost || null, effects: a.effects || null, notes: a.notes || null,
         })), { onConflict: "character_id,slot" });
         if (u.error) throw new Error(u.error.message);
       }

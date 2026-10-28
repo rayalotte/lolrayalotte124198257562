@@ -1,0 +1,1 @@
+COMMENT ON COLUMN public.characters.difficulty IS 'Character difficulty level: 1 = Fácil, 2 = Média, 3 = Difícil, 4 = Muito difícil; NULL = not set';

@@ -236,14 +236,14 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
 
         <TabsContent value="images" className="mt-6 space-y-6">
           <div className="grid gap-6 sm:grid-cols-[180px_1fr]">
-            <ImageField label="Retrato (seleção)" value={portrait} onChange={setPortrait} aspect="aspect-square" hint="Quadrado, rosto centralizado." />
-            <ImageField label="Arte principal" value={art} onChange={setArt} aspect="aspect-video" hint="Exibida inteira, sem cortes. PNG transparente fica ótimo." />
+            <ImageField label="Retrato (seleção)" value={portrait} onChange={setPortrait} aspect="aspect-square" cropAspect={1} hint="Quadrado. Ao escolher a imagem, você recorta o trecho exato." />
+            <ImageField label="Arte principal" value={art} onChange={setArt} aspect="aspect-video" cropAspect={16 / 9} hint="Formato largo (16:9). Você recorta para preencher o topo da página." />
           </div>
           <div>
             <Label className="mb-2 block">Imagens adicionais</Label>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {gallery.map((g, i) => (
-                <ImageField key={i} label={`#${i + 1}`} value={g} aspect="aspect-video"
+                <ImageField key={i} label={`#${i + 1}`} value={g} aspect="aspect-video" cropAspect={16 / 9}
                   onChange={(v) => setGallery((p) => (v.path || v.file ? p.map((x, j) => (j === i ? v : x)) : p.filter((_, j) => j !== i)))} />
               ))}
             </div>
@@ -285,7 +285,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
             })}
           </div>
           <div key={slot} className="grid gap-4 sm:grid-cols-[140px_1fr]">
-            <ImageField label="Ícone" value={ab.icon} onChange={(v) => setAb(slot, { icon: v })} aspect="aspect-square" />
+            <ImageField label="Ícone" value={ab.icon} onChange={(v) => setAb(slot, { icon: v })} aspect="aspect-square" cropAspect={1} />
             <div className="space-y-4">
               <Field label="Nome da habilidade"><Input value={ab.name ?? ""} onChange={(e) => setAb(slot, { name: e.target.value })} /></Field>
               <Field label="Descrição completa"><Textarea rows={4} value={ab.description ?? ""} onChange={(e) => setAb(slot, { description: e.target.value })} /></Field>

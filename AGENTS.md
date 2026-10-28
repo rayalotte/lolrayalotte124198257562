@@ -8,3 +8,8 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Data is read/written from the browser Supabase client; RLS (has_role admin) is the only write guard — keep all writes admin-gated in policies.
+- Images live in the private `media` bucket; DB stores storage paths, UI resolves them with signed URLs via `useMediaUrl` (public buckets are blocked in this workspace).
+- The first account ever created is granted admin by a trigger; later accounts get no role.

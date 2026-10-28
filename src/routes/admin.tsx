@@ -71,7 +71,7 @@ function Shell({ email, children }: { email?: string | undefined; children: Reac
 }
 
 function AuthForm() {
-  const [mode, setMode] = useState<"in" | "up">("in");
+  const [mode, setMode] = useState<"in" | "up" | "forgot">("in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -83,6 +83,11 @@ function AuthForm() {
       if (mode === "in") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+      } else if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+        if (error) throw error;
+        toast.success("Se o e-mail estiver cadastrado, você receberá um link para criar uma nova senha.");
+        setMode("in");
       } else {
         const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/admin` } });
         if (error) throw error;
@@ -93,19 +98,29 @@ function AuthForm() {
     } finally { setBusy(false); }
   };
 
+  const title = mode === "in" ? "Entrar" : mode === "up" ? "Criar conta" : "Recuperar senha";
   return (
     <div className="bg-stage flex min-h-screen items-center justify-center px-4">
       <form onSubmit={submit} className="w-full max-w-sm space-y-4 border bg-panel p-6">
         <div>
           <div className="label-caps text-primary">Acesso restrito</div>
-          <h1 className="font-display text-2xl font-bold">{mode === "in" ? "Entrar" : "Criar conta"}</h1>
+          <h1 className="font-display text-2xl font-bold">{title}</h1>
           {mode === "up" && <p className="mt-1 text-xs text-muted-foreground">Somente a primeira conta criada recebe permissão de administrador.</p>}
+          {mode === "forgot" && <p className="mt-1 text-xs text-muted-foreground">Informe seu e-mail e enviaremos um link para definir uma nova senha.</p>}
         </div>
         <div className="space-y-1.5"><Label htmlFor="em">E-mail</Label><Input id="em" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-        <div className="space-y-1.5"><Label htmlFor="pw">Senha</Label><Input id="pw" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} /></div>
-        <Button type="submit" className="w-full" disabled={busy}>{busy ? "Aguarde…" : mode === "in" ? "Entrar" : "Criar conta"}</Button>
+        {mode !== "forgot" && (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="pw">Senha</Label>
+              {mode === "in" && <button type="button" onClick={() => setMode("forgot")} className="text-xs text-muted-foreground hover:text-primary">Esqueci a senha</button>}
+            </div>
+            <Input id="pw" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+          </div>
+        )}
+        <Button type="submit" className="w-full" disabled={busy}>{busy ? "Aguarde…" : mode === "forgot" ? "Enviar link" : title}</Button>
         <button type="button" onClick={() => setMode(mode === "in" ? "up" : "in")} className="w-full text-center text-xs text-muted-foreground hover:text-primary">
-          {mode === "in" ? "Primeiro acesso? Criar conta" : "Já tenho conta"}
+          {mode === "in" ? "Primeiro acesso? Criar conta" : "Voltar para entrar"}
         </button>
         <Link to="/" className="block text-center text-xs text-muted-foreground hover:text-primary">← Voltar à enciclopédia</Link>
       </form>

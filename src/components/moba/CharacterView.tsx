@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import {
-  ABILITY_FIELDS, DIFFICULTY_LABEL, SLOTS, SLOT_LABEL, STAT_KEYS, characterDetailQuery,
+  ABILITY_FIELDS, DIFFICULTY_LABEL, DIFFICULTY_OPTIONS, SLOTS, SLOT_LABEL, STAT_KEYS, characterDetailQuery,
   type Ability, type Character, type Slot,
 } from "@/lib/moba";
 import { MediaImage, Monogram } from "./MediaImage";
@@ -91,8 +91,8 @@ function DifficultyPips({ level, label, className }: { level: number; label?: st
     <span className={cn("flex items-center gap-2", className)}>
       {label && <span className="label-caps text-muted-foreground">{label}</span>}
       <span className="flex gap-1">
-        {[1, 2, 3].map((i) => (
-          <span key={i} className={cn("h-1.5 w-6", i <= level ? "bg-primary" : "bg-border")} />
+        {DIFFICULTY_OPTIONS.map((d) => (
+          <span key={d.value} className={cn("h-1.5 w-6", d.value <= level ? "bg-primary" : "bg-border")} />
         ))}
       </span>
       <span className="text-xs text-muted-foreground">{DIFFICULTY_LABEL[level]}</span>

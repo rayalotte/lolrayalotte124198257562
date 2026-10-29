@@ -353,22 +353,24 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
         </TabsContent>
 
         <TabsContent value="extra" className="mt-6 space-y-8">
-          <div>
-            <Label className="mb-2 block">Itens recomendados</Label>
-            <div className="space-y-3">
-              {items.map((it, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <ItemPhoto value={it.image} onChange={(v) => setItems((p) => (v ? p.map((x, j) => (j === i ? { ...x, image: v } : x)) : p.filter((_, j) => j !== i)))} />
-                  <div className="flex-1 space-y-2">
-                    <Input placeholder="Item" value={it.name} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
-                    <Input placeholder="Observação" value={it.note} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, note: e.target.value } : x)))} />
+          {(["fundamental", "situacional"] as const).map((kind) => (
+            <div key={kind}>
+              <Label className="mb-2 block">{kind === "fundamental" ? "Itens fundamentais" : "Itens situacionais"}</Label>
+              <div className="space-y-3">
+                {items.map((it, i) => it.kind !== kind ? null : (
+                  <div key={i} className="flex items-start gap-2">
+                    <ItemPhoto value={it.image} onChange={(v) => setItems((p) => (v ? p.map((x, j) => (j === i ? { ...x, image: v } : x)) : p.filter((_, j) => j !== i)))} />
+                    <div className="flex-1 space-y-2">
+                      <Input placeholder="Item" value={it.name} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
+                      <Input placeholder="Observação" value={it.note} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, note: e.target.value } : x)))} />
+                    </div>
+                    <Button type="button" variant="ghost" size="icon" onClick={() => setItems((p) => p.filter((_, j) => j !== i))}><Trash2 className="size-4" /></Button>
                   </div>
-                  <Button type="button" variant="ghost" size="icon" onClick={() => setItems((p) => p.filter((_, j) => j !== i))}><Trash2 className="size-4" /></Button>
-                </div>
-              ))}
+                ))}
+              </div>
+              <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setItems((p) => [...p, { name: "", note: "", image: img(null), kind }])}><Plus className="size-3" />Adicionar item</Button>
             </div>
-            <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setItems((p) => [...p, { name: "", note: "", image: img(null) }])}><Plus className="size-3" />Adicionar item</Button>
-          </div>
+          ))}
           <div>
             <Label className="mb-2 block">Counters</Label>
             {!others.length && <p className="text-sm text-muted-foreground">Cadastre outros personagens para definir counters.</p>}

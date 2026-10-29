@@ -237,12 +237,23 @@ function StatsTab({ c }: { c: Character }) {
 
 function ItemsTab({ c }: { c: Character }) {
   if (!c.items.length) return <Empty>Nenhum item recomendado cadastrado.</Empty>;
+  const groups = ([
+    ["Itens fundamentais", c.items.filter((i) => (i.kind ?? "fundamental") === "fundamental")],
+    ["Itens situacionais", c.items.filter((i) => i.kind === "situacional")],
+  ] as const).filter(([, list]) => list.length > 0);
   return (
-    <div className="space-y-2">
-      {c.items.map((it, i) => (
-        <div key={i} className="flex gap-4 border bg-card p-4">
-          <MediaImage path={it.image} alt={it.name} className="size-14 shrink-0 object-cover" fallback={<Monogram name={it.name} className="size-14 text-xs" />} />
-          <div><div className="font-display font-semibold">{it.name}</div>{it.note && <p className="text-sm text-muted-foreground">{it.note}</p>}</div>
+    <div className="space-y-8">
+      {groups.map(([title, list]) => (
+        <div key={title}>
+          <Heading>{title}</Heading>
+          <div className="space-y-2">
+            {list.map((it, i) => (
+              <div key={i} className="flex gap-4 border bg-card p-4">
+                <MediaImage path={it.image} alt={it.name} className="size-14 shrink-0 object-cover" fallback={<Monogram name={it.name} className="size-14 text-xs" />} />
+                <div><div className="font-display font-semibold">{it.name}</div>{it.note && <p className="text-sm text-muted-foreground">{it.note}</p>}</div>
+              </div>
+            ))}
+          </div>
         </div>
       ))}
     </div>

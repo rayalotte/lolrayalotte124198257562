@@ -6,7 +6,7 @@ import { ImagePlus, Trash2, Plus, RefreshCw, Crop } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ABILITY_FIELDS, DIFFICULTY_OPTIONS, MAX_BYTES, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
-  type Ability, type Character, type Counter, type CustomStat, type Item, type Slot,
+  type Ability, type Character, type Counter, type CustomStat, type ItemKind, type Slot,
 } from "@/lib/moba";
 import { MediaImage } from "./MediaImage";
 import { CropDialog } from "./CropDialog";
@@ -121,7 +121,7 @@ function Field({ label, children, error }: { label: string; children: ReactNode;
 const csv = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
 
 type AbForm = Omit<Ability, "icon_url" | "slot"> & { slot: Slot; icon: Img };
-type ItemForm = { name: string; note: string; image: Img };
+type ItemForm = { name: string; note: string; image: Img; kind: ItemKind };
 const emptyAb = (slot: Slot): AbForm => ({ slot, name: "", description: "", target: "", damage: "", range: "", duration: "", cooldown: "", cost: "", effects: "", notes: "", icon: img(null) });
 
 export function CharacterForm({ initial, abilities = [], counters = [] }: { initial?: Character; abilities?: Ability[]; counters?: Counter[] }) {
@@ -140,7 +140,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
   const [gallery, setGallery] = useState<Img[]>((initial?.gallery ?? []).map(img));
   const [stats, setStats] = useState<Record<string, string>>(initial?.stats ?? {});
   const [custom, setCustom] = useState<CustomStat[]>(initial?.custom_stats ?? []);
-  const [items, setItems] = useState<ItemForm[]>((initial?.items ?? []).map((it) => ({ name: it.name, note: it.note ?? "", image: img(it.image ?? null) })));
+  const [items, setItems] = useState<ItemForm[]>((initial?.items ?? []).map((it) => ({ name: it.name, note: it.note ?? "", image: img(it.image ?? null), kind: it.kind ?? "fundamental" })));
   const [difficulty, setDifficulty] = useState<number | null>(initial?.difficulty ?? null);
   const [abs, setAbs] = useState<AbForm[]>(SLOTS.map((s) => {
     const a = abilities.find((x) => x.slot === s);
@@ -192,7 +192,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
         notes: f.notes || null, changelog: f.changelog || null, portrait_url: portraitPath, art_url: artPath,
         gallery: galleryPaths, stats: Object.fromEntries(Object.entries(stats).filter(([, v]) => v?.trim())),
         custom_stats: custom.filter((c) => c.label.trim()),
-        items: keptItems.map((it, i) => ({ name: it.name.trim(), note: it.note || undefined, image: itemImages[i] ?? null })),
+        items: keptItems.map((it, i) => ({ name: it.name.trim(), note: it.note || undefined, image: itemImages[i] ?? null, kind: it.kind })),
         difficulty,
         updated_at: new Date().toISOString(),
       };
@@ -353,22 +353,24 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
         </TabsContent>
 
         <TabsContent value="extra" className="mt-6 space-y-8">
-          <div>
-            <Label className="mb-2 block">Itens recomendados</Label>
-            <div className="space-y-3">
-              {items.map((it, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <ItemPhoto value={it.image} onChange={(v) => setItems((p) => (v ? p.map((x, j) => (j === i ? { ...x, image: v } : x)) : p.filter((_, j) => j !== i)))} />
-                  <div className="flex-1 space-y-2">
-                    <Input placeholder="Item" value={it.name} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
-                    <Input placeholder="Observação" value={it.note} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, note: e.target.value } : x)))} />
+          {(["fundamental", "situacional"] as const).map((kind) => (
+            <div key={kind}>
+              <Label className="mb-2 block">{kind === "fundamental" ? "Itens fundamentais" : "Itens situacionais"}</Label>
+              <div className="space-y-3">
+                {items.map((it, i) => it.kind !== kind ? null : (
+                  <div key={i} className="flex items-start gap-2">
+                    <ItemPhoto value={it.image} onChange={(v) => setItems((p) => (v ? p.map((x, j) => (j === i ? { ...x, image: v } : x)) : p.filter((_, j) => j !== i)))} />
+                    <div className="flex-1 space-y-2">
+                      <Input placeholder="Item" value={it.name} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
+                      <Input placeholder="Observação" value={it.note} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, note: e.target.value } : x)))} />
+                    </div>
+                    <Button type="button" variant="ghost" size="icon" onClick={() => setItems((p) => p.filter((_, j) => j !== i))}><Trash2 className="size-4" /></Button>
                   </div>
-                  <Button type="button" variant="ghost" size="icon" onClick={() => setItems((p) => p.filter((_, j) => j !== i))}><Trash2 className="size-4" /></Button>
-                </div>
-              ))}
+                ))}
+              </div>
+              <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setItems((p) => [...p, { name: "", note: "", image: img(null), kind }])}><Plus className="size-3" />Adicionar item</Button>
             </div>
-            <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setItems((p) => [...p, { name: "", note: "", image: img(null) }])}><Plus className="size-3" />Adicionar item</Button>
-          </div>
+          ))}
           <div>
             <Label className="mb-2 block">Counters</Label>
             {!others.length && <p className="text-sm text-muted-foreground">Cadastre outros personagens para definir counters.</p>}

@@ -121,6 +121,7 @@ function Field({ label, children, error }: { label: string; children: ReactNode;
 const csv = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
 
 type AbForm = Omit<Ability, "icon_url" | "slot"> & { slot: Slot; icon: Img };
+type ItemForm = { name: string; note: string; image: Img };
 const emptyAb = (slot: Slot): AbForm => ({ slot, name: "", description: "", target: "", damage: "", range: "", duration: "", cooldown: "", cost: "", effects: "", notes: "", icon: img(null) });
 
 export function CharacterForm({ initial, abilities = [], counters = [] }: { initial?: Character; abilities?: Ability[]; counters?: Counter[] }) {

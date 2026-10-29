@@ -242,6 +242,7 @@ function ItemsTab({ c }: { c: Character }) {
       {c.items.map((it, i) => (
         <li key={i} className="flex gap-4 border bg-card p-4">
           <span className="font-display text-xl text-primary">{String(i + 1).padStart(2, "0")}</span>
+          <MediaImage path={it.image} alt={it.name} className="size-14 shrink-0 object-cover" fallback={<Monogram name={it.name} className="size-14 text-xs" />} />
           <div><div className="font-display font-semibold">{it.name}</div>{it.note && <p className="text-sm text-muted-foreground">{it.note}</p>}</div>
         </li>
       ))}

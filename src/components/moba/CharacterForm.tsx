@@ -6,7 +6,7 @@ import { ImagePlus, Trash2, Plus, RefreshCw, Crop } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ABILITY_FIELDS, DIFFICULTY_OPTIONS, MAX_BYTES, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
-  type Ability, type Character, type Counter, type CustomStat, type Item, type Slot,
+  type Ability, type Character, type Counter, type CustomStat, type ItemKind, type Slot,
 } from "@/lib/moba";
 import { MediaImage } from "./MediaImage";
 import { CropDialog } from "./CropDialog";

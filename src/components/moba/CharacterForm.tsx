@@ -229,8 +229,8 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
       }
 
       // clean replaced/removed files (each upload has a unique path, never shared)
-      const before = [initial?.portrait_url, initial?.art_url, ...(initial?.gallery ?? []), ...abilities.map((a) => a.icon_url)];
-      const after = new Set([portraitPath, artPath, ...galleryPaths, ...abilityIcons]);
+      const before = [initial?.portrait_url, initial?.art_url, ...(initial?.gallery ?? []), ...(initial?.items ?? []).map((x) => x.image), ...abilities.map((a) => a.icon_url)];
+      const after = new Set([portraitPath, artPath, ...galleryPaths, ...abilityIcons, ...itemImages]);
       await removeImages(before.filter((p) => p && !after.has(p)));
 
       await Promise.all([qc.invalidateQueries({ queryKey: ["characters"] }), qc.invalidateQueries({ queryKey: ["character-detail", id] })]);
@@ -355,16 +355,19 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
         <TabsContent value="extra" className="mt-6 space-y-8">
           <div>
             <Label className="mb-2 block">Itens recomendados</Label>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {items.map((it, i) => (
-                <div key={i} className="flex gap-2">
-                  <Input placeholder="Item" value={it.name} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
-                  <Input placeholder="Observação" value={it.note ?? ""} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, note: e.target.value } : x)))} />
+                <div key={i} className="flex items-start gap-2">
+                  <ItemPhoto value={it.image} onChange={(v) => setItems((p) => (v ? p.map((x, j) => (j === i ? { ...x, image: v } : x)) : p.filter((_, j) => j !== i)))} />
+                  <div className="flex-1 space-y-2">
+                    <Input placeholder="Item" value={it.name} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
+                    <Input placeholder="Observação" value={it.note} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, note: e.target.value } : x)))} />
+                  </div>
                   <Button type="button" variant="ghost" size="icon" onClick={() => setItems((p) => p.filter((_, j) => j !== i))}><Trash2 className="size-4" /></Button>
                 </div>
               ))}
             </div>
-            <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setItems((p) => [...p, { name: "", note: "" }])}><Plus className="size-3" />Adicionar item</Button>
+            <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setItems((p) => [...p, { name: "", note: "", image: img(null) }])}><Plus className="size-3" />Adicionar item</Button>
           </div>
           <div>
             <Label className="mb-2 block">Counters</Label>

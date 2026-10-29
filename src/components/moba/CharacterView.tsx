@@ -238,15 +238,14 @@ function StatsTab({ c }: { c: Character }) {
 function ItemsTab({ c }: { c: Character }) {
   if (!c.items.length) return <Empty>Nenhum item recomendado cadastrado.</Empty>;
   return (
-    <ol className="space-y-2">
+    <div className="space-y-2">
       {c.items.map((it, i) => (
-        <li key={i} className="flex gap-4 border bg-card p-4">
-          <span className="font-display text-xl text-primary">{String(i + 1).padStart(2, "0")}</span>
+        <div key={i} className="flex gap-4 border bg-card p-4">
           <MediaImage path={it.image} alt={it.name} className="size-14 shrink-0 object-cover" fallback={<Monogram name={it.name} className="size-14 text-xs" />} />
           <div><div className="font-display font-semibold">{it.name}</div>{it.note && <p className="text-sm text-muted-foreground">{it.note}</p>}</div>
-        </li>
+        </div>
       ))}
-    </ol>
+    </div>
   );
 }
 

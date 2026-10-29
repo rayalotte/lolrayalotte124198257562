@@ -183,13 +183,16 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
       const artPath = await resolve(art, folder);
       const galleryPaths = (await Promise.all(gallery.map((g) => resolve(g, folder)))).filter((x): x is string => !!x);
       const abilityIcons = await Promise.all(abs.map((a) => resolve(a.icon, `${folder}/abilities`)));
+      const keptItems = items.filter((i) => i.name.trim());
+      const itemImages = await Promise.all(keptItems.map((it) => resolve(it.image, `${folder}/items`)));
 
       const row = {
         slug, name: f.name.trim(), title: f.title || null, short_description: f.short_description || null,
         biography: f.biography || null, role: f.role.trim() || null, lanes: csv(f.lanes), tags: csv(f.tags),
         notes: f.notes || null, changelog: f.changelog || null, portrait_url: portraitPath, art_url: artPath,
         gallery: galleryPaths, stats: Object.fromEntries(Object.entries(stats).filter(([, v]) => v?.trim())),
-        custom_stats: custom.filter((c) => c.label.trim()), items: items.filter((i) => i.name.trim()),
+        custom_stats: custom.filter((c) => c.label.trim()),
+        items: keptItems.map((it, i) => ({ name: it.name.trim(), note: it.note || undefined, image: itemImages[i] ?? null })),
         difficulty,
         updated_at: new Date().toISOString(),
       };

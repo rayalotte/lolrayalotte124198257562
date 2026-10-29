@@ -140,7 +140,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
   const [gallery, setGallery] = useState<Img[]>((initial?.gallery ?? []).map(img));
   const [stats, setStats] = useState<Record<string, string>>(initial?.stats ?? {});
   const [custom, setCustom] = useState<CustomStat[]>(initial?.custom_stats ?? []);
-  const [items, setItems] = useState<ItemForm[]>((initial?.items ?? []).map((it) => ({ name: it.name, note: it.note ?? "", image: img(it.image ?? null) })));
+  const [items, setItems] = useState<ItemForm[]>((initial?.items ?? []).map((it) => ({ name: it.name, note: it.note ?? "", image: img(it.image ?? null), kind: it.kind ?? "fundamental" })));
   const [difficulty, setDifficulty] = useState<number | null>(initial?.difficulty ?? null);
   const [abs, setAbs] = useState<AbForm[]>(SLOTS.map((s) => {
     const a = abilities.find((x) => x.slot === s);
@@ -192,7 +192,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
         notes: f.notes || null, changelog: f.changelog || null, portrait_url: portraitPath, art_url: artPath,
         gallery: galleryPaths, stats: Object.fromEntries(Object.entries(stats).filter(([, v]) => v?.trim())),
         custom_stats: custom.filter((c) => c.label.trim()),
-        items: keptItems.map((it, i) => ({ name: it.name.trim(), note: it.note || undefined, image: itemImages[i] ?? null })),
+        items: keptItems.map((it, i) => ({ name: it.name.trim(), note: it.note || undefined, image: itemImages[i] ?? null, kind: it.kind })),
         difficulty,
         updated_at: new Date().toISOString(),
       };

@@ -39,7 +39,8 @@ export const ABILITY_FIELDS = [
   ["cost", "Custo"],
 ] as const;
 
-export type Item = { name: string; note?: string; image?: string | null };
+export type ItemKind = "fundamental" | "situacional";
+export type Item = { name: string; note?: string; image?: string | null; kind?: ItemKind };
 export type CustomStat = { label: string; value: string };
 
 export const DIFFICULTY_OPTIONS = [

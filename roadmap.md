@@ -1,3 +1,3 @@
-- [ ] Adicionar classificação Melee/Ranged e AP/AD ao cadastro e armazenamento.
-- [ ] Incluir as classificações nos filtros de heróis.
-- [ ] Testar seleção dupla, salvamento e filtros.
+- [x] Adicionar classificação Melee/Ranged e AP/AD ao cadastro e armazenamento.
+- [x] Incluir as classificações nos filtros de heróis.
+- [x] Testar seleção dupla, salvamento e filtros.

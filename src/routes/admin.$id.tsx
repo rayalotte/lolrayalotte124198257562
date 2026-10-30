@@ -3,7 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { CharacterForm } from "@/components/moba/CharacterForm";
 import { characterDetailQuery, charactersQuery } from "@/lib/moba";
 
-export const Route = createFileRoute("/admin/$id")({ component: EditPage });
+export const Route = createFileRoute("/admin/$id")({
+  head: () => ({ meta: [
+    { title: "Editar personagem — Codex Arena" },
+    { name: "description", content: "Edite as informações de um personagem no Codex Arena." },
+    { property: "og:title", content: "Editar personagem — Codex Arena" },
+    { property: "og:description", content: "Edite as informações de um personagem no Codex Arena." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+  component: EditPage,
+});
 
 function EditPage() {
   const { id } = Route.useParams();

@@ -40,7 +40,7 @@ export function Encyclopedia({ slug }: { slug?: string }) {
       matchesClassification(c, attackTypes, damageTypes),
   );
   const selected: Character | undefined = slug ? all.find((c) => c.slug === slug) : all[0];
-  const anyFilter = q || role || lane || tag || attackTypes.length || damageTypes.length;
+  const anyFilter = Boolean(q || role || lane || tag || attackTypes.length || damageTypes.length);
   const groups = groupHeroes(filtered, order);
 
   return (

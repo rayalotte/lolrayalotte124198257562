@@ -6,6 +6,8 @@ import { charactersQuery, type Character } from "@/lib/moba";
 import { MediaImage, Monogram } from "./MediaImage";
 import { CharacterView } from "./CharacterView";
 import { cn } from "@/lib/utils";
+import { DEFAULT_HERO_ORDER, groupHeroes, type HeroOrder } from "@/lib/hero-order";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 function uniq(list: string[]) {
   return Array.from(new Set(list.filter(Boolean))).sort((a, b) => a.localeCompare(b));
@@ -17,6 +19,7 @@ export function Encyclopedia({ slug }: { slug?: string }) {
   const [role, setRole] = useState<string | null>(null);
   const [lane, setLane] = useState<string | null>(null);
   const [tag, setTag] = useState<string | null>(null);
+  const [order, setOrder] = useState<HeroOrder>(DEFAULT_HERO_ORDER);
 
   const all = chars ?? [];
   const roles = useMemo(() => uniq(all.map((c) => c.role ?? "")), [all]);
@@ -32,6 +35,7 @@ export function Encyclopedia({ slug }: { slug?: string }) {
   );
   const selected: Character | undefined = slug ? all.find((c) => c.slug === slug) : all[0];
   const anyFilter = q || role || lane || tag;
+  const groups = groupHeroes(filtered, order);
 
   return (
     <div className="flex min-h-screen flex-col lg:h-screen lg:flex-row lg:overflow-hidden">
@@ -70,6 +74,19 @@ export function Encyclopedia({ slug }: { slug?: string }) {
           <span className="label-caps">Heróis</span>
           <span className="label-caps">{filtered.length}/{all.length}</span>
         </div>
+        <div className="px-5 pb-3">
+          <label htmlFor="hero-order" className="label-caps mb-1.5 block">Organizar por</label>
+          <Select value={order} onValueChange={(value) => {
+            if (value === "alphabetical" || value === "lane" || value === "role") setOrder(value);
+          }}>
+            <SelectTrigger id="hero-order" aria-label="Organizar heróis por"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="alphabetical">Ordem alfabética</SelectItem>
+              <SelectItem value="lane">Rota</SelectItem>
+              <SelectItem value="role">Função</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <div className="max-h-[42vh] overflow-y-auto px-5 pb-5 pt-1 lg:max-h-none lg:flex-1">
           {isLoading && (
             <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-4">
@@ -80,8 +97,11 @@ export function Encyclopedia({ slug }: { slug?: string }) {
           {!isLoading && all.length > 0 && filtered.length === 0 && (
             <p className="py-6 text-center text-sm text-muted-foreground">Nenhum herói corresponde aos filtros.</p>
           )}
-          <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-4">
-            {filtered.map((c) => {
+          {groups.map((group) => (
+          <section key={group.label ?? "all"} className="mb-4 last:mb-0">
+            {group.label && <h2 className="label-caps mb-2 text-foreground">{group.label}</h2>}
+            <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-4">
+            {group.heroes.map((c) => {
               const active = selected?.id === c.id;
               return (
                 <Link
@@ -110,6 +130,8 @@ export function Encyclopedia({ slug }: { slug?: string }) {
               );
             })}
           </div>
+          </section>
+          ))}
         </div>
       </aside>
 

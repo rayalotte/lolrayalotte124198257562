@@ -8,8 +8,7 @@ import { CharacterView } from "./CharacterView";
 import { cn } from "@/lib/utils";
 import { DEFAULT_HERO_ORDER, groupHeroes, type HeroOrder } from "@/lib/hero-order";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ATTACK_TYPES, DAMAGE_TYPES, matchesClassification } from "@/lib/hero-classification";
-import { ClassificationPicker } from "./ClassificationPicker";
+import { matchesClassification } from "@/lib/hero-classification";
 import { Button } from "@/components/ui/button";
 
 function uniq(list: string[]) {
@@ -19,9 +18,9 @@ function uniq(list: string[]) {
 export function Encyclopedia({ slug }: { slug?: string }) {
   const { data: chars, isLoading, error } = useQuery(charactersQuery);
   const [q, setQ] = useState("");
-  const [role, setRole] = useState<string | null>(null);
-  const [lane, setLane] = useState<string | null>(null);
-  const [tag, setTag] = useState<string | null>(null);
+  const [role, setRole] = useState<string[]>([]);
+  const [lane, setLane] = useState<string[]>([]);
+  const [tag, setTag] = useState<string[]>([]);
   const [order, setOrder] = useState<HeroOrder>(DEFAULT_HERO_ORDER);
   const [attackTypes, setAttackTypes] = useState<string[]>([]);
   const [damageTypes, setDamageTypes] = useState<string[]>([]);
@@ -30,17 +29,19 @@ export function Encyclopedia({ slug }: { slug?: string }) {
   const roles = useMemo(() => uniq(all.map((c) => c.role ?? "")), [all]);
   const lanes = useMemo(() => uniq(all.flatMap((c) => c.lanes)), [all]);
   const tags = useMemo(() => uniq(all.flatMap((c) => c.tags)), [all]);
+  const attackOptions = useMemo(() => uniq(all.flatMap((c) => c.attack_types ?? [])), [all]);
+  const damageOptions = useMemo(() => uniq(all.flatMap((c) => c.damage_types ?? [])), [all]);
 
   const filtered = all.filter(
     (c) =>
       (!q || c.name.toLowerCase().includes(q.toLowerCase())) &&
-      (!role || c.role === role) &&
-      (!lane || c.lanes.includes(lane)) &&
-      (!tag || c.tags.includes(tag)) &&
+      (!role.length || role.includes(c.role ?? "")) &&
+      (!lane.length || lane.every((l) => c.lanes.includes(l))) &&
+      (!tag.length || tag.every((t) => c.tags.includes(t))) &&
       matchesClassification(c, attackTypes, damageTypes),
   );
   const selected: Character | undefined = slug ? all.find((c) => c.slug === slug) : all[0];
-  const anyFilter = Boolean(q || role || lane || tag || attackTypes.length || damageTypes.length);
+  const anyFilter = Boolean(q || role.length || lane.length || tag.length || attackTypes.length || damageTypes.length);
   const groups = groupHeroes(filtered, order);
 
   return (
@@ -64,14 +65,14 @@ export function Encyclopedia({ slug }: { slug?: string }) {
               className="h-10 w-full border bg-background/60 pl-9 pr-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
             />
           </div>
-          <FilterRow label="Função" options={roles} value={role} onChange={setRole} />
-          <FilterRow label="Rota" options={lanes} value={lane} onChange={setLane} />
-          <FilterRow label="Tags" options={tags} value={tag} onChange={setTag} />
-          <ClassificationPicker label="Tipo de ataque" options={ATTACK_TYPES} values={attackTypes} onChange={setAttackTypes} />
-          <ClassificationPicker label="Tipo de dano" options={DAMAGE_TYPES} values={damageTypes} onChange={setDamageTypes} />
+          <FilterRow label="Função" options={roles} values={role} onChange={setRole} single />
+          <FilterRow label="Rota" options={lanes} values={lane} onChange={setLane} single />
+          <FilterRow label="Tags" options={tags} values={tag} onChange={setTag} single />
+          <FilterRow label="Tipo de ataque" options={attackOptions} values={attackTypes} onChange={setAttackTypes} />
+          <FilterRow label="Tipo de dano" options={damageOptions} values={damageTypes} onChange={setDamageTypes} />
           {anyFilter && (
             <Button variant="ghost" size="sm"
-              onClick={() => { setQ(""); setRole(null); setLane(null); setTag(null); setAttackTypes([]); setDamageTypes([]); }}
+              onClick={() => { setQ(""); setRole([]); setLane([]); setTag([]); setAttackTypes([]); setDamageTypes([]); }}
               className="label-caps h-auto justify-start px-0 hover:text-primary"
             >
               <X className="size-3" /> Limpar filtros
@@ -160,8 +161,12 @@ export function Encyclopedia({ slug }: { slug?: string }) {
   );
 }
 
-function FilterRow({ label, options, value, onChange }: { label: string; options: string[]; value: string | null; onChange: (v: string | null) => void }) {
+function FilterRow({ label, options, values, onChange, single }: { label: string; options: string[]; values: string[]; onChange: (v: string[]) => void; single?: boolean }) {
   if (!options.length) return null;
+  const toggle = (o: string) => {
+    if (single) onChange(values.includes(o) ? [] : [o]);
+    else onChange(values.includes(o) ? values.filter((v) => v !== o) : [...values, o]);
+  };
   return (
     <div>
       <div className="label-caps mb-1.5">{label}</div>
@@ -169,10 +174,10 @@ function FilterRow({ label, options, value, onChange }: { label: string; options
         {options.map((o) => (
           <button
             key={o}
-            onClick={() => onChange(value === o ? null : o)}
+            onClick={() => toggle(o)}
             className={cn(
               "border px-2 py-0.5 text-xs transition-colors",
-              value === o ? "border-primary bg-primary text-primary-foreground" : "text-muted-foreground hover:border-primary/60 hover:text-foreground",
+              values.includes(o) ? "border-primary bg-primary text-primary-foreground" : "text-muted-foreground hover:border-primary/60 hover:text-foreground",
             )}
           >
             {o}

@@ -16,8 +16,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { ATTACK_TYPES, DAMAGE_TYPES } from "@/lib/hero-classification";
-import { ClassificationPicker } from "./ClassificationPicker";
 
 /* ---------- image picker ---------- */
 type Img = { path: string | null; file: File | null; preview: string | null; orig: string | null };
@@ -144,8 +142,8 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
   const [custom, setCustom] = useState<CustomStat[]>(initial?.custom_stats ?? []);
   const [items, setItems] = useState<ItemForm[]>((initial?.items ?? []).map((it) => ({ name: it.name, note: it.note ?? "", image: img(it.image ?? null), kind: it.kind ?? "fundamental" })));
   const [difficulty, setDifficulty] = useState<number | null>(initial?.difficulty ?? null);
-  const [attackTypes, setAttackTypes] = useState<string[]>(initial?.attack_types ?? []);
-  const [damageTypes, setDamageTypes] = useState<string[]>(initial?.damage_types ?? []);
+  const [attackTypes, setAttackTypes] = useState<string>((initial?.attack_types ?? []).join(", "));
+  const [damageTypes, setDamageTypes] = useState<string>((initial?.damage_types ?? []).join(", "));
   const [abs, setAbs] = useState<AbForm[]>(SLOTS.map((s) => {
     const a = abilities.find((x) => x.slot === s);
     if (!a) return emptyAb(s);
@@ -198,8 +196,8 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
         custom_stats: custom.filter((c) => c.label.trim()),
         items: keptItems.map((it, i) => ({ name: it.name.trim(), note: it.note || undefined, image: itemImages[i] ?? null, kind: it.kind })),
         difficulty,
-        attack_types: attackTypes,
-        damage_types: damageTypes,
+        attack_types: csv(attackTypes),
+        damage_types: csv(damageTypes),
         updated_at: new Date().toISOString(),
       };
       const res = initial
@@ -275,8 +273,8 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
             <Field label="Rotas (separe por vírgula)"><Input value={f.lanes} onChange={set("lanes")} placeholder="ex.: Topo, Selva" /></Field>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <ClassificationPicker label="Tipo de ataque" options={ATTACK_TYPES} values={attackTypes} onChange={setAttackTypes} />
-            <ClassificationPicker label="Tipo de dano" options={DAMAGE_TYPES} values={damageTypes} onChange={setDamageTypes} />
+            <Field label="Tipo de ataque (separe por vírgula)"><Input value={attackTypes} onChange={(e) => setAttackTypes(e.target.value)} placeholder="ex.: Melee, Ranged" /></Field>
+            <Field label="Tipo de dano (separe por vírgula)"><Input value={damageTypes} onChange={(e) => setDamageTypes(e.target.value)} placeholder="ex.: AP, AD" /></Field>
           </div>
           <Field label="Dificuldade">
             <div className="flex flex-wrap items-center gap-2">

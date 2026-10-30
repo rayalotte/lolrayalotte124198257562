@@ -23,6 +23,12 @@ describe("hero organization", () => {
       ["Mago", ["Ahri", "Zoe"]], ["Tanque", ["Braum"]],
     ]);
   });
+  it("orders lanes as Topo, Selva, Meio, Inferior, Suporte", () => {
+    const allLanes = [{ name: "Ahri", lanes: ["Suporte", "Inferior", "Meio", "Selva", "Topo"] }] as Character[];
+    expect(groupHeroes(allLanes, "lane").map(g => g.label)).toEqual([
+      "Topo", "Selva", "Meio", "Inferior", "Suporte",
+    ]);
+  });
   it("keeps unassigned heroes visible", () => {
     const unassigned = [{ name: "Akali", role: null, lanes: [] }] as unknown as Character[];
     expect(groupHeroes(unassigned, "lane")[0]?.label).toBe("Sem rota");

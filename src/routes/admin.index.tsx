@@ -12,7 +12,17 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export const Route = createFileRoute("/admin/")({ component: AdminHome });
+export const Route = createFileRoute("/admin/")({
+  head: () => ({ meta: [
+    { title: "Gerenciar personagens — Codex Arena" },
+    { name: "description", content: "Gerencie os personagens cadastrados no Codex Arena." },
+    { property: "og:title", content: "Gerenciar personagens — Codex Arena" },
+    { property: "og:description", content: "Gerencie os personagens cadastrados no Codex Arena." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
+  component: AdminHome,
+});
 
 function missing(c: Character) {
   const m: string[] = [];

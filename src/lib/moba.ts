@@ -60,6 +60,8 @@ export type Character = {
   biography: string | null;
   role: string | null;
   lanes: string[];
+  attack_types: string[];
+  damage_types: string[];
   tags: string[];
   notes: string | null;
   portrait_url: string | null;

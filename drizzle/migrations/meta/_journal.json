@@ -29,6 +29,13 @@
       "when": 1793193647176,
       "tag": "0003_add_ability_target",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793362877552,
+      "tag": "0004_character_combat_classification",
+      "breakpoints": true
     }
   ]
 }

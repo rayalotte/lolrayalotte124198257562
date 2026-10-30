@@ -76,10 +76,12 @@ export type Database = {
       characters: {
         Row: {
           art_url: string | null
+          attack_types: string[]
           biography: string | null
           changelog: string | null
           created_at: string
           custom_stats: Json
+          damage_types: string[]
           difficulty: number | null
           gallery: Json
           id: string
@@ -98,10 +100,12 @@ export type Database = {
         }
         Insert: {
           art_url?: string | null
+          attack_types?: string[]
           biography?: string | null
           changelog?: string | null
           created_at?: string
           custom_stats?: Json
+          damage_types?: string[]
           difficulty?: number | null
           gallery?: Json
           id?: string
@@ -120,10 +124,12 @@ export type Database = {
         }
         Update: {
           art_url?: string | null
+          attack_types?: string[]
           biography?: string | null
           changelog?: string | null
           created_at?: string
           custom_stats?: Json
+          damage_types?: string[]
           difficulty?: number | null
           gallery?: Json
           id?: string

@@ -8,6 +8,9 @@ import { CharacterView } from "./CharacterView";
 import { cn } from "@/lib/utils";
 import { DEFAULT_HERO_ORDER, groupHeroes, type HeroOrder } from "@/lib/hero-order";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ATTACK_TYPES, DAMAGE_TYPES, matchesClassification } from "@/lib/hero-classification";
+import { ClassificationPicker } from "./ClassificationPicker";
+import { Button } from "@/components/ui/button";
 
 function uniq(list: string[]) {
   return Array.from(new Set(list.filter(Boolean))).sort((a, b) => a.localeCompare(b));
@@ -20,6 +23,8 @@ export function Encyclopedia({ slug }: { slug?: string }) {
   const [lane, setLane] = useState<string | null>(null);
   const [tag, setTag] = useState<string | null>(null);
   const [order, setOrder] = useState<HeroOrder>(DEFAULT_HERO_ORDER);
+  const [attackTypes, setAttackTypes] = useState<string[]>([]);
+  const [damageTypes, setDamageTypes] = useState<string[]>([]);
 
   const all = chars ?? [];
   const roles = useMemo(() => uniq(all.map((c) => c.role ?? "")), [all]);
@@ -31,10 +36,11 @@ export function Encyclopedia({ slug }: { slug?: string }) {
       (!q || c.name.toLowerCase().includes(q.toLowerCase())) &&
       (!role || c.role === role) &&
       (!lane || c.lanes.includes(lane)) &&
-      (!tag || c.tags.includes(tag)),
+      (!tag || c.tags.includes(tag)) &&
+      matchesClassification(c, attackTypes, damageTypes),
   );
   const selected: Character | undefined = slug ? all.find((c) => c.slug === slug) : all[0];
-  const anyFilter = q || role || lane || tag;
+  const anyFilter = Boolean(q || role || lane || tag || attackTypes.length || damageTypes.length);
   const groups = groupHeroes(filtered, order);
 
   return (
@@ -61,13 +67,15 @@ export function Encyclopedia({ slug }: { slug?: string }) {
           <FilterRow label="Função" options={roles} value={role} onChange={setRole} />
           <FilterRow label="Rota" options={lanes} value={lane} onChange={setLane} />
           <FilterRow label="Tags" options={tags} value={tag} onChange={setTag} />
+          <ClassificationPicker label="Tipo de ataque" options={ATTACK_TYPES} values={attackTypes} onChange={setAttackTypes} />
+          <ClassificationPicker label="Tipo de dano" options={DAMAGE_TYPES} values={damageTypes} onChange={setDamageTypes} />
           {anyFilter && (
-            <button
-              onClick={() => { setQ(""); setRole(null); setLane(null); setTag(null); }}
-              className="label-caps flex items-center gap-1 hover:text-primary"
+            <Button variant="ghost" size="sm"
+              onClick={() => { setQ(""); setRole(null); setLane(null); setTag(null); setAttackTypes([]); setDamageTypes([]); }}
+              className="label-caps h-auto justify-start px-0 hover:text-primary"
             >
               <X className="size-3" /> Limpar filtros
-            </button>
+            </Button>
           )}
         </div>
         <div className="flex items-center justify-between border-t px-5 py-2">

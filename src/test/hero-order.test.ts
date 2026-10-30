@@ -11,7 +11,7 @@ const heroes = [
 describe("hero organization", () => {
   it("defaults to alphabetical order", () => {
     expect(DEFAULT_HERO_ORDER).toBe("alphabetical");
-    expect(groupHeroes(heroes, DEFAULT_HERO_ORDER)[0].heroes.map(h => h.name)).toEqual(["Ahri", "Braum", "Zoe"]);
+    expect(groupHeroes(heroes, DEFAULT_HERO_ORDER)[0]?.heroes.map(h => h.name)).toEqual(["Ahri", "Braum", "Zoe"]);
   });
   it("groups heroes by every assigned lane", () => {
     expect(groupHeroes(heroes, "lane").map(g => [g.label, g.heroes.map(h => h.name)])).toEqual([
@@ -25,7 +25,7 @@ describe("hero organization", () => {
   });
   it("keeps unassigned heroes visible", () => {
     const unassigned = [{ name: "Akali", role: null, lanes: [] }] as unknown as Character[];
-    expect(groupHeroes(unassigned, "lane")[0].label).toBe("Sem rota");
-    expect(groupHeroes(unassigned, "role")[0].heroes[0].name).toBe("Akali");
+    expect(groupHeroes(unassigned, "lane")[0]?.label).toBe("Sem rota");
+    expect(groupHeroes(unassigned, "role")[0]?.heroes[0]?.name).toBe("Akali");
   });
 });

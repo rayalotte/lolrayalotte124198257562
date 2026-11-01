@@ -191,7 +191,7 @@ function Overview({ c }: { c: Character }) {
   const rows = [
     ["Nome", c.name], ["Título", c.title], ["Função", c.role], ["Rotas", c.lanes.join(", ")],
     ["Tipo de ataque", c.attack_types?.join(", ")], ["Tipo de dano", c.damage_types?.join(", ")],
-    ["Recurso", c.resource], ["Dificuldade", c.difficulty ? DIFFICULTY_LABEL[c.difficulty] : ""],
+    ["Recurso", c.resource], ["Pico de poder", c.power_spike], ["Dificuldade", c.difficulty ? DIFFICULTY_LABEL[c.difficulty] : ""],
   ].filter(([, v]) => v);
   return (
     <div className="grid gap-8 md:grid-cols-[1fr_260px]">

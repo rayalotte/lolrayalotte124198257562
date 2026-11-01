@@ -53,6 +53,8 @@ export const DIFFICULTY_LABEL: Record<number, string> = { 1: "Fácil", 2: "Médi
 
 export const RESOURCE_OPTIONS = ["Mana", "Energia", "Fúria", "Vida", "Nenhum"] as const;
 
+export const POWER_SPIKE_OPTIONS = ["Earlygame", "Midgame", "Lategame"] as const;
+
 export type Character = {
   id: string;
   slug: string;
@@ -75,6 +77,7 @@ export type Character = {
   changelog: string | null;
   difficulty: number | null;
   resource: string | null;
+  power_spike: string | null;
   created_at: string;
 };
 export type Counter = { id?: string; character_id: string; target_id: string; kind: "strong" | "weak"; note: string | null };

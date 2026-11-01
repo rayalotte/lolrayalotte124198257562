@@ -77,7 +77,7 @@ export type Character = {
   changelog: string | null;
   difficulty: number | null;
   resource: string | null;
-  power_spike: string | null;
+  power_spikes: string[];
   created_at: string;
 };
 export type Counter = { id?: string; character_id: string; target_id: string; kind: "strong" | "weak"; note: string | null };

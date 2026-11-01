@@ -39,7 +39,7 @@ export function Encyclopedia({ slug }: { slug?: string }) {
       (!role.length || role.includes(c.role ?? "")) &&
       (!lane.length || lane.every((l) => c.lanes.includes(l))) &&
       (!tag.length || tag.every((t) => c.tags.includes(t))) &&
-      (!powerSpike.length || powerSpike.includes(c.power_spike ?? "")) &&
+      (!powerSpike.length || powerSpike.every((p) => (c.power_spikes ?? []).includes(p))) &&
       matchesClassification(c, attackTypes, damageTypes),
   );
   const selected: Character | undefined = slug ? all.find((c) => c.slug === slug) : all[0];
@@ -72,7 +72,7 @@ export function Encyclopedia({ slug }: { slug?: string }) {
           <FilterRow label="Tags" options={tags} values={tag} onChange={setTag} single />
           <FilterRow label="Tipo de ataque" options={attackOptions} values={attackTypes} onChange={setAttackTypes} />
           <FilterRow label="Tipo de dano" options={damageOptions} values={damageTypes} onChange={setDamageTypes} />
-          <FilterRow label="Pico de poder" options={[...POWER_SPIKE_OPTIONS]} values={powerSpike} onChange={setPowerSpike} single />
+          <FilterRow label="Pico de poder" options={[...POWER_SPIKE_OPTIONS]} values={powerSpike} onChange={setPowerSpike} />
           {anyFilter && (
             <Button variant="ghost" size="sm"
               onClick={() => { setQ(""); setRole([]); setLane([]); setTag([]); setAttackTypes([]); setDamageTypes([]); setPowerSpike([]); }}

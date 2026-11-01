@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ImagePlus, Trash2, Plus, RefreshCw, Crop } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  ABILITY_FIELDS, DIFFICULTY_OPTIONS, MAX_BYTES, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
+  ABILITY_FIELDS, DIFFICULTY_OPTIONS, MAX_BYTES, RESOURCE_OPTIONS, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
   type Ability, type Character, type Counter, type CustomStat, type ItemKind, type Slot,
 } from "@/lib/moba";
 import { MediaImage } from "./MediaImage";
@@ -142,6 +142,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
   const [custom, setCustom] = useState<CustomStat[]>(initial?.custom_stats ?? []);
   const [items, setItems] = useState<ItemForm[]>((initial?.items ?? []).map((it) => ({ name: it.name, note: it.note ?? "", image: img(it.image ?? null), kind: it.kind ?? "fundamental" })));
   const [difficulty, setDifficulty] = useState<number | null>(initial?.difficulty ?? null);
+  const [resource, setResource] = useState<string | null>(initial?.resource ?? null);
   const [attackTypes, setAttackTypes] = useState<string>((initial?.attack_types ?? []).join(", "));
   const [damageTypes, setDamageTypes] = useState<string>((initial?.damage_types ?? []).join(", "));
   const [abs, setAbs] = useState<AbForm[]>(SLOTS.map((s) => {
@@ -196,6 +197,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
         custom_stats: custom.filter((c) => c.label.trim()),
         items: keptItems.map((it, i) => ({ name: it.name.trim(), note: it.note || undefined, image: itemImages[i] ?? null, kind: it.kind })),
         difficulty,
+        resource,
         attack_types: csv(attackTypes),
         damage_types: csv(damageTypes),
         updated_at: new Date().toISOString(),
@@ -285,6 +287,17 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
                 </button>
               ))}
               {difficulty != null && <Button type="button" variant="ghost" size="sm" onClick={() => setDifficulty(null)}>Limpar</Button>}
+            </div>
+          </Field>
+          <Field label="Recurso">
+            <div className="flex flex-wrap items-center gap-2">
+              {RESOURCE_OPTIONS.map((r) => (
+                <button key={r} type="button" onClick={() => setResource((p) => (p === r ? null : r))}
+                  className={cn("border px-4 py-2 font-display text-sm transition-colors", resource === r ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary/60")}>
+                  {r}
+                </button>
+              ))}
+              {resource && <Button type="button" variant="ghost" size="sm" onClick={() => setResource(null)}>Limpar</Button>}
             </div>
           </Field>
           <Field label="Tags (separe por vírgula)"><Input value={f.tags} onChange={set("tags")} /></Field>

@@ -51,6 +51,8 @@ export const DIFFICULTY_OPTIONS = [
 ] as const;
 export const DIFFICULTY_LABEL: Record<number, string> = { 1: "Fácil", 2: "Média", 3: "Difícil", 4: "Muito difícil" };
 
+export const RESOURCE_OPTIONS = ["Mana", "Energia", "Fúria", "Vida", "Nenhum"] as const;
+
 export type Character = {
   id: string;
   slug: string;
@@ -72,6 +74,7 @@ export type Character = {
   items: Item[];
   changelog: string | null;
   difficulty: number | null;
+  resource: string | null;
   created_at: string;
 };
 export type Counter = { id?: string; character_id: string; target_id: string; kind: "strong" | "weak"; note: string | null };

@@ -90,6 +90,7 @@ export type Database = {
           name: string
           notes: string | null
           portrait_url: string | null
+          resource: string | null
           role: string | null
           short_description: string | null
           slug: string
@@ -114,6 +115,7 @@ export type Database = {
           name: string
           notes?: string | null
           portrait_url?: string | null
+          resource?: string | null
           role?: string | null
           short_description?: string | null
           slug: string
@@ -138,6 +140,7 @@ export type Database = {
           name?: string
           notes?: string | null
           portrait_url?: string | null
+          resource?: string | null
           role?: string | null
           short_description?: string | null
           slug?: string

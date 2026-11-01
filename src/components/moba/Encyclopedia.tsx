@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Search, X, Shield } from "lucide-react";
-import { charactersQuery, type Character } from "@/lib/moba";
+import { charactersQuery, POWER_SPIKE_OPTIONS, type Character } from "@/lib/moba";
 import { MediaImage, Monogram } from "./MediaImage";
 import { CharacterView } from "./CharacterView";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,7 @@ export function Encyclopedia({ slug }: { slug?: string }) {
   const [order, setOrder] = useState<HeroOrder>(DEFAULT_HERO_ORDER);
   const [attackTypes, setAttackTypes] = useState<string[]>([]);
   const [damageTypes, setDamageTypes] = useState<string[]>([]);
+  const [powerSpike, setPowerSpike] = useState<string[]>([]);
 
   const all = chars ?? [];
   const roles = useMemo(() => uniq(all.map((c) => c.role ?? "")), [all]);
@@ -38,10 +39,11 @@ export function Encyclopedia({ slug }: { slug?: string }) {
       (!role.length || role.includes(c.role ?? "")) &&
       (!lane.length || lane.every((l) => c.lanes.includes(l))) &&
       (!tag.length || tag.every((t) => c.tags.includes(t))) &&
+      (!powerSpike.length || powerSpike.includes(c.power_spike ?? "")) &&
       matchesClassification(c, attackTypes, damageTypes),
   );
   const selected: Character | undefined = slug ? all.find((c) => c.slug === slug) : all[0];
-  const anyFilter = Boolean(q || role.length || lane.length || tag.length || attackTypes.length || damageTypes.length);
+  const anyFilter = Boolean(q || role.length || lane.length || tag.length || attackTypes.length || damageTypes.length || powerSpike.length);
   const groups = groupHeroes(filtered, order);
 
   return (
@@ -70,9 +72,10 @@ export function Encyclopedia({ slug }: { slug?: string }) {
           <FilterRow label="Tags" options={tags} values={tag} onChange={setTag} single />
           <FilterRow label="Tipo de ataque" options={attackOptions} values={attackTypes} onChange={setAttackTypes} />
           <FilterRow label="Tipo de dano" options={damageOptions} values={damageTypes} onChange={setDamageTypes} />
+          <FilterRow label="Pico de poder" options={[...POWER_SPIKE_OPTIONS]} values={powerSpike} onChange={setPowerSpike} single />
           {anyFilter && (
             <Button variant="ghost" size="sm"
-              onClick={() => { setQ(""); setRole([]); setLane([]); setTag([]); setAttackTypes([]); setDamageTypes([]); }}
+              onClick={() => { setQ(""); setRole([]); setLane([]); setTag([]); setAttackTypes([]); setDamageTypes([]); setPowerSpike([]); }}
               className="label-caps h-auto justify-start px-0 hover:text-primary"
             >
               <X className="size-3" /> Limpar filtros

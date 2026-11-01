@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { ImagePlus, Trash2, Plus, RefreshCw, Crop } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  ABILITY_FIELDS, DIFFICULTY_OPTIONS, MAX_BYTES, RESOURCE_OPTIONS, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
+  ABILITY_FIELDS, DIFFICULTY_OPTIONS, MAX_BYTES, POWER_SPIKE_OPTIONS, RESOURCE_OPTIONS, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
   type Ability, type Character, type Counter, type CustomStat, type ItemKind, type Slot,
 } from "@/lib/moba";
 import { MediaImage } from "./MediaImage";
@@ -143,6 +143,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
   const [items, setItems] = useState<ItemForm[]>((initial?.items ?? []).map((it) => ({ name: it.name, note: it.note ?? "", image: img(it.image ?? null), kind: it.kind ?? "fundamental" })));
   const [difficulty, setDifficulty] = useState<number | null>(initial?.difficulty ?? null);
   const [resource, setResource] = useState<string | null>(initial?.resource ?? null);
+  const [powerSpike, setPowerSpike] = useState<string | null>(initial?.power_spike ?? null);
   const [attackTypes, setAttackTypes] = useState<string>((initial?.attack_types ?? []).join(", "));
   const [damageTypes, setDamageTypes] = useState<string>((initial?.damage_types ?? []).join(", "));
   const [abs, setAbs] = useState<AbForm[]>(SLOTS.map((s) => {
@@ -198,6 +199,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
         items: keptItems.map((it, i) => ({ name: it.name.trim(), note: it.note || undefined, image: itemImages[i] ?? null, kind: it.kind })),
         difficulty,
         resource,
+        power_spike: powerSpike,
         attack_types: csv(attackTypes),
         damage_types: csv(damageTypes),
         updated_at: new Date().toISOString(),
@@ -298,6 +300,17 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
                 </button>
               ))}
               {resource && <Button type="button" variant="ghost" size="sm" onClick={() => setResource(null)}>Limpar</Button>}
+            </div>
+          </Field>
+          <Field label="Pico de poder">
+            <div className="flex flex-wrap items-center gap-2">
+              {POWER_SPIKE_OPTIONS.map((p) => (
+                <button key={p} type="button" onClick={() => setPowerSpike((prev) => (prev === p ? null : p))}
+                  className={cn("border px-4 py-2 font-display text-sm transition-colors", powerSpike === p ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary/60")}>
+                  {p}
+                </button>
+              ))}
+              {powerSpike && <Button type="button" variant="ghost" size="sm" onClick={() => setPowerSpike(null)}>Limpar</Button>}
             </div>
           </Field>
           <Field label="Tags (separe por vírgula)"><Input value={f.tags} onChange={set("tags")} /></Field>

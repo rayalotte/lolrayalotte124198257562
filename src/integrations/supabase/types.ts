@@ -91,6 +91,7 @@ export type Database = {
           notes: string | null
           portrait_url: string | null
           power_spike: string | null
+          power_spikes: string[]
           resource: string | null
           role: string | null
           short_description: string | null
@@ -117,6 +118,7 @@ export type Database = {
           notes?: string | null
           portrait_url?: string | null
           power_spike?: string | null
+          power_spikes?: string[]
           resource?: string | null
           role?: string | null
           short_description?: string | null
@@ -143,6 +145,7 @@ export type Database = {
           notes?: string | null
           portrait_url?: string | null
           power_spike?: string | null
+          power_spikes?: string[]
           resource?: string | null
           role?: string | null
           short_description?: string | null

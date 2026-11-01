@@ -43,6 +43,13 @@
       "when": 1793503080623,
       "tag": "0005_add_resource_column",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793503359584,
+      "tag": "0006_add_power_spike_column",
+      "breakpoints": true
     }
   ]
 }

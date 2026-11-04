@@ -1,5 +1,5 @@
 export const ATTACK_TYPES = ["Melee", "Ranged"] as const;
-export const DAMAGE_TYPES = ["AP", "AD"] as const;
+export const DAMAGE_TYPES = ["AP", "AD", "Dano Verdadeiro"] as const;
 
 export function toggleClassification(values: string[], value: string) {
   return values.includes(value) ? values.filter(v => v !== value) : [...values, value];

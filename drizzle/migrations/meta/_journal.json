@@ -57,6 +57,13 @@
       "when": 1793503694418,
       "tag": "0007_power_spikes_multi",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793765306999,
+      "tag": "0008_admin_item_library",
+      "breakpoints": true
     }
   ]
 }

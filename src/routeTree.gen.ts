@@ -14,6 +14,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminIdRouteImport } from './routes/admin.$id'
+import { Route as AdminItemsRouteImport } from './routes/admin.items'
 import { Route as AdminNewRouteImport } from './routes/admin.new'
 import { Route as HeroesSlugRouteImport } from './routes/heroes.$slug'
 
@@ -42,6 +43,11 @@ const AdminIdRoute = AdminIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminItemsRoute = AdminItemsRouteImport.update({
+  id: '/items',
+  path: '/items',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminNewRoute = AdminNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/admin/$id': typeof AdminIdRoute
+  '/admin/items': typeof AdminItemsRoute
   '/admin/new': typeof AdminNewRoute
   '/heroes/$slug': typeof HeroesSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/$id': typeof AdminIdRoute
+  '/admin/items': typeof AdminItemsRoute
   '/admin/new': typeof AdminNewRoute
   '/heroes/$slug': typeof HeroesSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/admin/$id': typeof AdminIdRoute
+  '/admin/items': typeof AdminItemsRoute
   '/admin/new': typeof AdminNewRoute
   '/heroes/$slug': typeof HeroesSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/reset-password'
     | '/admin/$id'
+    | '/admin/items'
     | '/admin/new'
     | '/heroes/$slug'
     | '/admin/'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/reset-password'
     | '/admin/$id'
+    | '/admin/items'
     | '/admin/new'
     | '/heroes/$slug'
     | '/admin'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/reset-password'
     | '/admin/$id'
+    | '/admin/items'
     | '/admin/new'
     | '/heroes/$slug'
     | '/admin/'
@@ -153,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/items': {
+      id: '/admin/items'
+      path: '/items'
+      fullPath: '/admin/items'
+      preLoaderRoute: typeof AdminItemsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/new': {
       id: '/admin/new'
       path: '/new'
@@ -172,12 +191,14 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminIdRoute: typeof AdminIdRoute
+  AdminItemsRoute: typeof AdminItemsRoute
   AdminNewRoute: typeof AdminNewRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminIdRoute: AdminIdRoute,
+  AdminItemsRoute: AdminItemsRoute,
   AdminNewRoute: AdminNewRoute,
   AdminIndexRoute: AdminIndexRoute,
 }

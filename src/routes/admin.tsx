@@ -65,6 +65,10 @@ function Shell({ email, children }: { email?: string | undefined; children: Reac
           <Button variant="outline" size="sm" onClick={() => supabase.auth.signOut()}>Sair</Button>
         </div>
       </header>
+      <nav className="flex gap-2 border-b px-5 py-2" aria-label="Administração">
+        <Button asChild variant="ghost"><Link to="/admin">Personagens</Link></Button>
+        <Button asChild variant="ghost"><Link to="/admin/items">Biblioteca de itens</Link></Button>
+      </nav>
       <div className="p-5 md:p-8">{children}</div>
     </div>
   );

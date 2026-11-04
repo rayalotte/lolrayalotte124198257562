@@ -8,6 +8,10 @@ import {
   ABILITY_FIELDS, DIFFICULTY_OPTIONS, MAX_BYTES, POWER_SPIKE_OPTIONS, RESOURCE_OPTIONS, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
   type Ability, type Character, type Counter, type CustomStat, type ItemKind, type Slot,
 } from "@/lib/moba";
+import { ItemPhoto, img, type Img } from "./ItemPhoto";
+import { LibraryItemPicker } from "./LibraryItemPicker";
+import { itemLibraryQuery } from "@/lib/item-library";
+import { resolveLibraryItem } from "@/lib/item-references";
 import { toggleClassification } from "@/lib/hero-classification";
 import { MediaImage } from "./MediaImage";
 import { CropDialog } from "./CropDialog";
@@ -19,8 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 /* ---------- image picker ---------- */
-type Img = { path: string | null; file: File | null; preview: string | null; orig: string | null };
-const img = (path: string | null): Img => ({ path, file: null, preview: null, orig: null });
+
 
 function ImageField({ label, value, onChange, aspect, cropAspect, hint }: { label: string; value: Img; onChange: (v: Img) => void; aspect: string; cropAspect: number; hint?: string }) {
   const ref = useRef<HTMLInputElement>(null);
@@ -69,52 +72,6 @@ function ImageField({ label, value, onChange, aspect, cropAspect, hint }: { labe
   );
 }
 
-/* ---------- compact photo for list rows (items) ---------- */
-function ItemPhoto({ value, onChange }: { value: Img; onChange: (v: Img | null) => void }) {
-  const ref = useRef<HTMLInputElement>(null);
-  const [err, setErr] = useState<string | null>(null);
-  const [cropSrc, setCropSrc] = useState<string | null>(null);
-  const pick = (f?: File) => {
-    if (!f) return;
-    const e = validateImage(f);
-    if (e) { setErr(e); return; }
-    setErr(null);
-    setCropSrc(URL.createObjectURL(f));
-  };
-  const applyCrop = (file: File) => {
-    if (file.size > MAX_BYTES) { setErr("O recorte ficou grande demais (máximo 8 MB). Tente um zoom maior ou outra imagem."); cancelCrop(); return; }
-    if (value.preview) URL.revokeObjectURL(value.preview);
-    if (value.orig && value.orig !== cropSrc) URL.revokeObjectURL(value.orig);
-    onChange({ path: null, file, preview: URL.createObjectURL(file), orig: cropSrc });
-    setCropSrc(null);
-  };
-  const cancelCrop = () => {
-    if (cropSrc && cropSrc !== value.orig) URL.revokeObjectURL(cropSrc);
-    setCropSrc(null);
-  };
-  return (
-    <div className="w-16 shrink-0">
-      <button type="button" onClick={() => ref.current?.click()} title="Foto do item"
-        className="relative flex size-16 items-center justify-center overflow-hidden border border-dashed bg-panel-raised text-muted-foreground transition-colors hover:border-primary/60">
-        {value.preview ? <img src={value.preview} alt="" className="size-full object-cover" />
-          : value.path ? <MediaImage path={value.path} alt="" className="size-full object-cover" />
-          : <ImagePlus className="size-4" />}
-        {value.file && <span className="absolute inset-x-0 bottom-0 bg-primary text-center text-[9px] text-primary-foreground">não salva</span>}
-      </button>
-      {(value.preview || value.path) && (
-        <div className="mt-1 flex justify-center gap-0.5">
-          <Button type="button" size="sm" variant="ghost" className="h-6 px-1.5" title="Trocar" onClick={() => ref.current?.click()}><RefreshCw className="size-3" /></Button>
-          {value.orig && <Button type="button" size="sm" variant="ghost" className="h-6 px-1.5" title="Recortar" onClick={() => setCropSrc(value.orig)}><Crop className="size-3" /></Button>}
-          <Button type="button" size="sm" variant="ghost" className="h-6 px-1.5" title="Remover" onClick={() => onChange(null)}><Trash2 className="size-3" /></Button>
-        </div>
-      )}
-      <input ref={ref} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => { pick(e.target.files?.[0]); e.target.value = ""; }} />
-      {err && <p className="mt-1 text-[10px] text-destructive">{err}</p>}
-      {cropSrc && <CropDialog src={cropSrc} aspect={1} title="Recortar — foto do item" onCancel={cancelCrop} onDone={applyCrop} />}
-    </div>
-  );
-}
-
 /* ---------- small inputs ---------- */
 function Field({ label, children, error }: { label: string; children: ReactNode; error?: string | undefined }) {
   return <div className="space-y-1.5"><Label>{label}</Label>{children}{error && <p className="text-xs text-destructive">{error}</p>}</div>;
@@ -122,7 +79,7 @@ function Field({ label, children, error }: { label: string; children: ReactNode;
 const csv = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
 
 type AbForm = Omit<Ability, "icon_url" | "slot"> & { slot: Slot; icon: Img };
-type ItemForm = { name: string; note: string; image: Img; kind: ItemKind };
+type ItemForm = { name: string; note: string; image: Img; kind: ItemKind; library_id?: string; description?: string };
 const emptyAb = (slot: Slot): AbForm => ({ slot, name: "", description: "", target: "", damage: "", range: "", duration: "", cooldown: "", cost: "", effects: "", notes: "", icon: img(null) });
 
 export function CharacterForm({ initial, abilities = [], counters = [] }: { initial?: Character; abilities?: Ability[]; counters?: Counter[] }) {
@@ -141,7 +98,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
   const [gallery, setGallery] = useState<Img[]>((initial?.gallery ?? []).map(img));
   const [stats, setStats] = useState<Record<string, string>>(initial?.stats ?? {});
   const [custom, setCustom] = useState<CustomStat[]>(initial?.custom_stats ?? []);
-  const [items, setItems] = useState<ItemForm[]>((initial?.items ?? []).map((it) => ({ name: it.name, note: it.note ?? "", image: img(it.image ?? null), kind: it.kind ?? "fundamental" })));
+  const [items, setItems] = useState<ItemForm[]>((initial?.items ?? []).map((it) => ({ name: it.name, note: it.note ?? "", image: img(it.image ?? null), kind: it.kind ?? "fundamental", library_id: it.library_id, description: it.description })));
   const [difficulty, setDifficulty] = useState<number | null>(initial?.difficulty ?? null);
   const [resource, setResource] = useState<string | null>(initial?.resource ?? null);
   const [powerSpikes, setPowerSpikes] = useState<string[]>(initial?.power_spikes ?? []);
@@ -156,6 +113,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState("basic");
+  const [pickingKind, setPickingKind] = useState<ItemKind | null>(null);
   const [slot, setSlot] = useState<Slot>("P");
 
   useEffect(() => () => { [portrait, art, ...gallery, ...items.map((i) => i.image), ...abs.map((a) => a.icon)].forEach((i) => { if (i.preview) URL.revokeObjectURL(i.preview); if (i.orig) URL.revokeObjectURL(i.orig); }); }, []); // eslint-disable-line
@@ -189,7 +147,8 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
       const galleryPaths = (await Promise.all(gallery.map((g) => resolve(g, folder)))).filter((x): x is string => !!x);
       const abilityIcons = await Promise.all(abs.map((a) => resolve(a.icon, `${folder}/abilities`)));
       const keptItems = items.filter((i) => i.name.trim());
-      const itemImages = await Promise.all(keptItems.map((it) => resolve(it.image, `${folder}/items`)));
+      const library = keptItems.some((it) => it.library_id) ? await qc.fetchQuery({ ...itemLibraryQuery, staleTime: 0 }) : [];
+      const itemImages = await Promise.all(keptItems.map((it) => it.library_id ? it.image.path : resolve(it.image, `${folder}/items`)));
 
       const row = {
         slug, name: f.name.trim(), title: f.title || null, short_description: f.short_description || null,
@@ -197,7 +156,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
         notes: f.notes || null, changelog: f.changelog || null, portrait_url: portraitPath, art_url: artPath,
         gallery: galleryPaths, stats: Object.fromEntries(Object.entries(stats).filter(([, v]) => v?.trim())),
         custom_stats: custom.filter((c) => c.label.trim()),
-        items: keptItems.map((it, i) => ({ name: it.name.trim(), note: it.note || undefined, image: itemImages[i] ?? null, kind: it.kind })),
+        items: keptItems.map((it, i) => resolveLibraryItem({ name: it.name.trim(), note: it.note || undefined, image: itemImages[i] ?? null, kind: it.kind, library_id: it.library_id, description: it.description }, library)),
         difficulty,
         resource,
         power_spikes: powerSpikes,
@@ -238,7 +197,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
       }
 
       // clean replaced/removed files (each upload has a unique path, never shared)
-      const before = [initial?.portrait_url, initial?.art_url, ...(initial?.gallery ?? []), ...(initial?.items ?? []).map((x) => x.image), ...abilities.map((a) => a.icon_url)];
+      const before = [initial?.portrait_url, initial?.art_url, ...(initial?.gallery ?? []), ...(initial?.items ?? []).filter((x) => !x.library_id).map((x) => x.image), ...abilities.map((a) => a.icon_url)];
       const after = new Set([portraitPath, artPath, ...galleryPaths, ...abilityIcons, ...itemImages]);
       await removeImages(before.filter((p) => p && !after.has(p)));
 
@@ -253,7 +212,8 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
     }
   };
 
-  const ab = abs.find((a) => a.slot === slot)!;
+  const ab = abs.find((a) => a.slot === slot);
+  if (!ab) return null;
 
   return (
     <div className="mx-auto max-w-4xl pb-24">
@@ -360,8 +320,8 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
         <TabsContent value="abilities" className="mt-6">
           <div className="mb-4 flex gap-2">
             {SLOTS.map((s) => {
-              const a = abs.find((x) => x.slot === s)!;
-              const filled = a.name || a.description || a.icon.path || a.icon.file;
+              const a = abs.find((x) => x.slot === s);
+              const filled = a?.name || a?.description || a?.icon.path || a?.icon.file;
               return (
                 <button key={s} type="button" onClick={() => setSlot(s)}
                   className={cn("border px-4 py-2 font-display text-sm transition-colors", slot === s ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary/60", filled && slot !== s && "text-primary")}>
@@ -394,16 +354,17 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
               <div className="space-y-3">
                 {items.map((it, i) => it.kind !== kind ? null : (
                   <div key={i} className="flex items-start gap-2">
-                    <ItemPhoto value={it.image} onChange={(v) => setItems((p) => (v ? p.map((x, j) => (j === i ? { ...x, image: v } : x)) : p.filter((_, j) => j !== i)))} />
-                    <div className="flex-1 space-y-2">
-                      <Input placeholder="Item" value={it.name} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
+                    {it.library_id ? <MediaImage path={it.image.path} alt={it.name} className="size-16 shrink-0 object-cover" /> : <ItemPhoto value={it.image} onChange={(v) => setItems((p) => (v ? p.map((x, j) => (j === i ? { ...x, image: v } : x)) : p.filter((_, j) => j !== i)))} />}
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <Input placeholder="Item" readOnly={!!it.library_id} value={it.name} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} />
                       <Input placeholder="Observação" value={it.note} onChange={(e) => setItems((p) => p.map((x, j) => (j === i ? { ...x, note: e.target.value } : x)))} />
                     </div>
                     <Button type="button" variant="ghost" size="icon" onClick={() => setItems((p) => p.filter((_, j) => j !== i))}><Trash2 className="size-4" /></Button>
                   </div>
                 ))}
               </div>
-              <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setItems((p) => [...p, { name: "", note: "", image: img(null), kind }])}><Plus className="size-3" />Adicionar item</Button>
+              <Button type="button" variant="outline" size="sm" className="mt-2 mr-2" onClick={() => setPickingKind(kind)}><Plus className="size-3" />Selecionar da biblioteca</Button>
+              <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setItems((p) => [...p, { name: "", note: "", image: img(null), kind }])}><Plus className="size-3" />Item avulso</Button>
             </div>
           ))}
           <div>
@@ -430,6 +391,8 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
           <Field label="Histórico de alterações / informações adicionais"><Textarea rows={5} value={f.changelog} onChange={set("changelog")} /></Field>
         </TabsContent>
       </Tabs>
+
+      {pickingKind && <LibraryItemPicker kind={pickingKind} selectedIds={items.filter((it) => it.kind === pickingKind).map((it) => it.library_id ?? "")} onClose={() => setPickingKind(null)} onSelect={(entry) => { setItems((prev) => [...prev, { library_id: entry.id, name: entry.name, description: entry.description, note: "", image: img(entry.image), kind: pickingKind }]); setPickingKind(null); }} />}
 
       <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 px-5 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-4xl justify-end gap-2">

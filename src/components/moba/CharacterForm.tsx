@@ -8,6 +8,7 @@ import {
   ABILITY_FIELDS, DIFFICULTY_OPTIONS, MAX_BYTES, POWER_SPIKE_OPTIONS, RESOURCE_OPTIONS, SLOTS, SLOT_LABEL, STAT_KEYS, charactersQuery, removeImages, slugify, uploadImage, validateImage,
   type Ability, type Character, type Counter, type CustomStat, type ItemKind, type Slot,
 } from "@/lib/moba";
+import { toggleClassification } from "@/lib/hero-classification";
 import { MediaImage } from "./MediaImage";
 import { CropDialog } from "./CropDialog";
 import { Button } from "@/components/ui/button";

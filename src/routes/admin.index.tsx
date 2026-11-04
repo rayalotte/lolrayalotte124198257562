@@ -56,7 +56,7 @@ function AdminHome() {
     const { data: abs } = await supabase.from("abilities").select("icon_url").eq("character_id", del.c.id);
     const { error } = await supabase.from("characters").delete().eq("id", del.c.id);
     if (error) { toast.error("Não foi possível excluir: " + error.message); setBusy(false); return; }
-    await removeImages([del.c.portrait_url, del.c.art_url, ...del.c.gallery, ...del.c.items.map((x) => x.image), ...(abs ?? []).map((x) => x.icon_url)]);
+    await removeImages([del.c.portrait_url, del.c.art_url, ...del.c.gallery, ...del.c.items.filter((x) => !x.library_id).map((x) => x.image), ...(abs ?? []).map((x) => x.icon_url)]);
     await qc.invalidateQueries({ queryKey: ["characters"] });
     toast.success(`${del.c.name} foi excluído.`);
     setDel(null); setBusy(false);

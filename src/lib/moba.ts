@@ -40,7 +40,7 @@ export const ABILITY_FIELDS = [
 ] as const;
 
 export type ItemKind = "fundamental" | "situacional";
-export type Item = { name: string; note?: string; image?: string | null; kind?: ItemKind };
+export type Item = { name: string; note?: string; image?: string | null; kind?: ItemKind; library_id?: string; description?: string };
 export type CustomStat = { label: string; value: string };
 
 export const DIFFICULTY_OPTIONS = [
@@ -146,7 +146,8 @@ export function useMediaUrl(path: string | null | undefined) {
     enabled: !!path,
     staleTime: 1000 * 60 * 60 * 20,
     queryFn: async () => {
-      const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path!, 60 * 60 * 24);
+      if (!path) return null;
+      const { data, error } = await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 60 * 24);
       if (error) throw error;
       return data.signedUrl;
     },

@@ -12,7 +12,7 @@ import { ItemPhoto, img, type Img } from "./ItemPhoto";
 import { LibraryItemPicker } from "./LibraryItemPicker";
 import { itemLibraryQuery } from "@/lib/item-library";
 import { resolveLibraryItem } from "@/lib/item-references";
-import { toggleClassification } from "@/lib/hero-classification";
+import { normalizePowerSpikes, togglePowerSpike } from "@/lib/hero-power";
 import { MediaImage } from "./MediaImage";
 import { CropDialog } from "./CropDialog";
 import { Button } from "@/components/ui/button";
@@ -101,7 +101,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
   const [items, setItems] = useState<ItemForm[]>((initial?.items ?? []).map((it) => ({ name: it.name, note: it.note ?? "", image: img(it.image ?? null), kind: it.kind ?? "fundamental", library_id: it.library_id, description: it.description })));
   const [difficulty, setDifficulty] = useState<number | null>(initial?.difficulty ?? null);
   const [resource, setResource] = useState<string | null>(initial?.resource ?? null);
-  const [powerSpikes, setPowerSpikes] = useState<string[]>(initial?.power_spikes ?? []);
+  const [powerSpikes, setPowerSpikes] = useState<string[]>(() => normalizePowerSpikes(initial?.power_spikes));
   const [attackTypes, setAttackTypes] = useState<string>((initial?.attack_types ?? []).join(", "));
   const [damageTypes, setDamageTypes] = useState<string>((initial?.damage_types ?? []).join(", "));
   const [abs, setAbs] = useState<AbForm[]>(SLOTS.map((s) => {
@@ -159,7 +159,7 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
         items: keptItems.map((it, i) => resolveLibraryItem({ name: it.name.trim(), note: it.note || undefined, image: itemImages[i] ?? null, kind: it.kind, library_id: it.library_id, description: it.description }, library)),
         difficulty,
         resource,
-        power_spikes: powerSpikes,
+        power_spikes: normalizePowerSpikes(powerSpikes),
         attack_types: csv(attackTypes),
         damage_types: csv(damageTypes),
         updated_at: new Date().toISOString(),
@@ -255,10 +255,10 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
           <Field label="Recurso">
             <div className="flex flex-wrap items-center gap-2">
               {RESOURCE_OPTIONS.map((r) => (
-                <button key={r} type="button" onClick={() => setResource((p) => (p === r ? null : r))}
+                <Button key={r} type="button" variant="outline" aria-pressed={resource === r} onClick={() => setResource((p) => (p === r ? null : r))}
                   className={cn("border px-4 py-2 font-display text-sm transition-colors", resource === r ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary/60")}>
                   {r}
-                </button>
+                </Button>
               ))}
               {resource && <Button type="button" variant="ghost" size="sm" onClick={() => setResource(null)}>Limpar</Button>}
             </div>
@@ -266,10 +266,10 @@ export function CharacterForm({ initial, abilities = [], counters = [] }: { init
           <Field label="Pico de poder">
             <div className="flex flex-wrap items-center gap-2">
               {POWER_SPIKE_OPTIONS.map((p) => (
-                <button key={p} type="button" onClick={() => setPowerSpikes((prev) => toggleClassification(prev, p))}
+                <Button key={p} type="button" variant="outline" aria-pressed={powerSpikes.includes(p)} onClick={() => setPowerSpikes((prev) => togglePowerSpike(prev, p))}
                   className={cn("border px-4 py-2 font-display text-sm transition-colors", powerSpikes.includes(p) ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary/60")}>
                   {p}
-                </button>
+                </Button>
               ))}
               {powerSpikes.length > 0 && <Button type="button" variant="ghost" size="sm" onClick={() => setPowerSpikes([])}>Limpar</Button>}
             </div>

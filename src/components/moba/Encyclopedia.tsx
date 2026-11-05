@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type React from "react";
 import { Search, X, Shield } from "lucide-react";
 import { charactersQuery, POWER_SPIKE_OPTIONS, type Character } from "@/lib/moba";
 import { MediaImage, Monogram } from "./MediaImage";
@@ -15,7 +16,53 @@ function uniq(list: string[]) {
   return Array.from(new Set(list.filter(Boolean))).sort((a, b) => a.localeCompare(b));
 }
 
+function useStoredSize(key: string, initial: number) {
+  const [size, setSize] = useState(initial);
+  useEffect(() => {
+    const v = Number(localStorage.getItem(key));
+    if (v > 0) setSize(v);
+  }, [key]);
+  useEffect(() => { localStorage.setItem(key, String(size)); }, [key, size]);
+  return [size, setSize] as const;
+}
+
+function DragHandle({ axis, onDrag, label }: { axis: "x" | "y"; onDrag: (delta: number) => void; label: string }) {
+  const start = (e: React.PointerEvent) => {
+    e.preventDefault();
+    let last = axis === "x" ? e.clientX : e.clientY;
+    const move = (ev: PointerEvent) => {
+      const cur = axis === "x" ? ev.clientX : ev.clientY;
+      onDrag(cur - last);
+      last = cur;
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      document.body.style.userSelect = "";
+    };
+    document.body.style.userSelect = "none";
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  };
+  return (
+    <div
+      role="separator"
+      aria-label={label}
+      aria-orientation={axis === "x" ? "vertical" : "horizontal"}
+      onPointerDown={start}
+      className={cn(
+        "group hidden shrink-0 items-center justify-center bg-border transition-colors hover:bg-primary lg:flex",
+        axis === "x" ? "w-1 cursor-col-resize" : "h-1 cursor-row-resize",
+      )}
+    >
+      <span className={cn("bg-muted-foreground/60 group-hover:bg-primary-foreground", axis === "x" ? "h-8 w-px" : "h-px w-8")} />
+    </div>
+  );
+}
+
 export function Encyclopedia({ slug }: { slug?: string }) {
+  const [sidebarW, setSidebarW] = useStoredSize("codex-sidebar-w", 340);
+  const [filtersH, setFiltersH] = useStoredSize("codex-filters-h", 420);
   const { data: chars, isLoading, error } = useQuery(charactersQuery);
   const [q, setQ] = useState("");
   const [role, setRole] = useState<string[]>([]);
@@ -48,7 +95,11 @@ export function Encyclopedia({ slug }: { slug?: string }) {
 
   return (
     <div className="flex min-h-screen flex-col lg:h-screen lg:flex-row lg:overflow-hidden">
-      <aside className="flex w-full shrink-0 flex-col border-b bg-panel lg:w-[340px] lg:border-b-0 lg:border-r">
+      <aside
+        className="flex w-full shrink-0 flex-col border-b bg-panel lg:w-[var(--sw)] lg:border-b-0"
+        style={{ "--sw": `${sidebarW}px` } as React.CSSProperties}
+      >
+        <div className="shrink-0 lg:h-[var(--fh)] lg:overflow-y-auto" style={{ "--fh": `${filtersH}px` } as React.CSSProperties}>
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <Link to="/" className="font-display text-lg font-bold tracking-[0.25em] text-foreground">
             CODEX<span className="text-primary">·</span>ARENA
@@ -82,7 +133,9 @@ export function Encyclopedia({ slug }: { slug?: string }) {
             </Button>
           )}
         </div>
-        <div className="flex items-center justify-between border-t px-5 py-2">
+        </div>
+        <DragHandle axis="y" label="Redimensionar filtros" onDrag={(d) => setFiltersH((h) => Math.min(Math.max(h + d, 120), window.innerHeight - 160))} />
+        <div className="flex items-center justify-between border-t px-5 py-2 lg:border-t-0">
           <span className="label-caps">Heróis</span>
           <span className="label-caps">{filtered.length}/{all.length}</span>
         </div>
@@ -146,6 +199,7 @@ export function Encyclopedia({ slug }: { slug?: string }) {
           ))}
         </div>
       </aside>
+      <DragHandle axis="x" label="Redimensionar painel lateral" onDrag={(d) => setSidebarW((w) => Math.min(Math.max(w + d, 240), Math.min(760, window.innerWidth - 400)))} />
 
       <main className="relative flex-1 lg:overflow-y-auto">
         {isLoading ? (

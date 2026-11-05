@@ -20,6 +20,6 @@ describe("Reusable items", () => {
     expect(resolveLibraryItem(legacy, library)).toEqual(legacy);
   });
   it("keeps archived items on characters that already use them", () => {
-    expect(resolveLibraryItem({ library_id: "sword", name: "Espada" }, [{ ...library[0], archived: true }]).name).toBe("Espada");
+    expect(resolveLibraryItem({ library_id: "sword", name: "Espada" }, library.map((item) => ({ ...item, archived: true }))).name).toBe("Espada");
   });
 });

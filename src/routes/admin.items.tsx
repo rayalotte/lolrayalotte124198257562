@@ -65,7 +65,7 @@ function ItemLibraryPage() {
   </div>;
 }
 
-function ItemEditor({ item, onClose, onSaved }: { item?: LibraryItem; onClose: () => void; onSaved: () => Promise<void> }) {
+function ItemEditor({ item, onClose, onSaved }: { item?: LibraryItem | undefined; onClose: () => void; onSaved: () => Promise<void> }) {
   const [name, setName] = useState(item?.name ?? "");
   const [description, setDescription] = useState(item?.description ?? "");
   const [photo, setPhoto] = useState<Img>(img(item?.image ?? null));

@@ -40,7 +40,7 @@ export const ABILITY_FIELDS = [
 ] as const;
 
 export type ItemKind = "fundamental" | "situacional";
-export type Item = { name: string; note?: string; image?: string | null; kind?: ItemKind; library_id?: string; description?: string };
+export type Item = { name: string; note?: string | undefined; image?: string | null; kind?: ItemKind; library_id?: string | undefined; description?: string | undefined };
 export type CustomStat = { label: string; value: string };
 
 export const DIFFICULTY_OPTIONS = [

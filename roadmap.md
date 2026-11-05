@@ -1,5 +1,5 @@
-- [ ] Criar biblioteca de itens exclusiva do ADM e seleção reutilizável nos personagens.
-- [ ] Verificar cadastro, reutilização, edição e acesso restrito à biblioteca.
+- [x] Criar biblioteca de itens exclusiva do ADM e seleção reutilizável nos personagens.
+- [x] Verificar cadastro, reutilização, edição e acesso restrito à biblioteca.
 - [x] Adicionar classificação Melee/Ranged e AP/AD ao cadastro e armazenamento.
 - [x] Incluir as classificações nos filtros de heróis.
 - [x] Testar seleção dupla, salvamento e filtros.

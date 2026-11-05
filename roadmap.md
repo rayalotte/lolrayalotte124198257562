@@ -1,3 +1,5 @@
+- [ ] Corrigir erro na seleção de pico de poder mantendo seleção múltipla.
+- [ ] Adicionar Recurso próprio e verificar salvamento no painel de ADM.
 - [x] Criar biblioteca de itens exclusiva do ADM e seleção reutilizável nos personagens.
 - [x] Verificar cadastro, reutilização, edição e acesso restrito à biblioteca.
 - [x] Adicionar classificação Melee/Ranged e AP/AD ao cadastro e armazenamento.

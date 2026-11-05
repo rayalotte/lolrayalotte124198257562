@@ -51,9 +51,9 @@ export const DIFFICULTY_OPTIONS = [
 ] as const;
 export const DIFFICULTY_LABEL: Record<number, string> = { 1: "Fácil", 2: "Média", 3: "Difícil", 4: "Muito difícil" };
 
-export const RESOURCE_OPTIONS = ["Mana", "Energia", "Fúria", "Vida", "Nenhum"] as const;
+export const RESOURCE_OPTIONS = ["Mana", "Energia", "Fúria", "Vida", "Nenhum", "Recurso próprio"] as const;
 
-export const POWER_SPIKE_OPTIONS = ["Earlygame", "Midgame", "Lategame"] as const;
+export { POWER_SPIKE_OPTIONS } from "./hero-power";
 
 export type Character = {
   id: string;

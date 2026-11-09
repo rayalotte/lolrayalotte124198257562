@@ -16,12 +16,15 @@ function uniq(list: string[]) {
   return Array.from(new Set(list.filter(Boolean))).sort((a, b) => a.localeCompare(b));
 }
 
-function useStoredSize(key: string, initial: number) {
+// Narrowest side panel that still fits 4 hero icons per row (incl. padding and a scrollbar).
+const SIDEBAR_MIN_W = 400;
+
+function useStoredSize(key: string, initial: number, min = 0) {
   const [size, setSize] = useState(initial);
   useEffect(() => {
     const v = Number(localStorage.getItem(key));
-    if (v > 0) setSize(v);
-  }, [key]);
+    if (v > 0) setSize(Math.max(v, min));
+  }, [key, min]);
   useEffect(() => { localStorage.setItem(key, String(size)); }, [key, size]);
   return [size, setSize] as const;
 }
@@ -61,7 +64,7 @@ function DragHandle({ axis, onDrag, label }: { axis: "x" | "y"; onDrag: (delta: 
 }
 
 export function Encyclopedia({ slug }: { slug?: string }) {
-  const [sidebarW, setSidebarW] = useStoredSize("codex-sidebar-w3", 400);
+  const [sidebarW, setSidebarW] = useStoredSize("codex-sidebar-w4", 420, SIDEBAR_MIN_W);
   const [filtersH, setFiltersH] = useStoredSize("codex-filters-h2", 0);
   const filtersRef = useRef<HTMLDivElement>(null);
   const { data: chars, isLoading, error } = useQuery(charactersQuery);
@@ -200,7 +203,7 @@ export function Encyclopedia({ slug }: { slug?: string }) {
           ))}
         </div>
       </aside>
-      <DragHandle axis="x" label="Redimensionar painel lateral" onDrag={(d) => setSidebarW((w) => Math.min(Math.max(w + d, 240), Math.min(760, window.innerWidth - 400)))} />
+      <DragHandle axis="x" label="Redimensionar painel lateral" onDrag={(d) => setSidebarW((w) => Math.min(Math.max(w + d, SIDEBAR_MIN_W), Math.min(760, window.innerWidth - 400)))} />
 
       <main className="relative flex-1 lg:overflow-y-auto">
         {isLoading ? (

@@ -61,7 +61,7 @@ function DragHandle({ axis, onDrag, label }: { axis: "x" | "y"; onDrag: (delta: 
 }
 
 export function Encyclopedia({ slug }: { slug?: string }) {
-  const [sidebarW, setSidebarW] = useStoredSize("codex-sidebar-w", 340);
+  const [sidebarW, setSidebarW] = useStoredSize("codex-sidebar-w2", 360);
   const [filtersH, setFiltersH] = useStoredSize("codex-filters-h2", 0);
   const filtersRef = useRef<HTMLDivElement>(null);
   const { data: chars, isLoading, error } = useQuery(charactersQuery);

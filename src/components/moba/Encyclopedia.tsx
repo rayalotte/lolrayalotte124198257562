@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type React from "react";
 import { Search, X, Shield } from "lucide-react";
 import { charactersQuery, POWER_SPIKE_OPTIONS, type Character } from "@/lib/moba";
@@ -62,7 +62,8 @@ function DragHandle({ axis, onDrag, label }: { axis: "x" | "y"; onDrag: (delta: 
 
 export function Encyclopedia({ slug }: { slug?: string }) {
   const [sidebarW, setSidebarW] = useStoredSize("codex-sidebar-w", 340);
-  const [filtersH, setFiltersH] = useStoredSize("codex-filters-h", 420);
+  const [filtersH, setFiltersH] = useStoredSize("codex-filters-h2", 0);
+  const filtersRef = useRef<HTMLDivElement>(null);
   const { data: chars, isLoading, error } = useQuery(charactersQuery);
   const [q, setQ] = useState("");
   const [role, setRole] = useState<string[]>([]);
@@ -99,7 +100,7 @@ export function Encyclopedia({ slug }: { slug?: string }) {
         className="flex w-full shrink-0 flex-col border-b bg-panel lg:w-[var(--sw)] lg:border-b-0"
         style={{ "--sw": `${sidebarW}px` } as React.CSSProperties}
       >
-        <div className="shrink-0 lg:h-[var(--fh)] lg:overflow-y-auto" style={{ "--fh": `${filtersH}px` } as React.CSSProperties}>
+        <div ref={filtersRef} className={cn("shrink-0", filtersH > 0 && "lg:h-[var(--fh)] lg:overflow-y-auto")} style={{ "--fh": `${filtersH}px` } as React.CSSProperties}>
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <Link to="/" className="font-display text-lg font-bold tracking-[0.25em] text-foreground">
             CODEX<span className="text-primary">·</span>ARENA
@@ -134,7 +135,7 @@ export function Encyclopedia({ slug }: { slug?: string }) {
           )}
         </div>
         </div>
-        <DragHandle axis="y" label="Redimensionar filtros" onDrag={(d) => setFiltersH((h) => Math.min(Math.max(h + d, 120), window.innerHeight - 160))} />
+        <DragHandle axis="y" label="Redimensionar filtros" onDrag={(d) => setFiltersH((h) => Math.min(Math.max((h || filtersRef.current?.offsetHeight || 300) + d, 120), window.innerHeight - 160))} />
         <div className="flex items-center justify-between border-t px-5 py-2 lg:border-t-0">
           <span className="label-caps">Heróis</span>
           <span className="label-caps">{filtered.length}/{all.length}</span>
@@ -154,7 +155,7 @@ export function Encyclopedia({ slug }: { slug?: string }) {
         </div>
         <div className="max-h-[42vh] overflow-y-auto px-5 pb-5 pt-1 lg:max-h-none lg:flex-1">
           {isLoading && (
-            <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-4">
+            <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-[repeat(auto-fill,69px)]">
               {Array.from({ length: 12 }).map((_, i) => <div key={i} className="aspect-square animate-pulse bg-muted" />)}
             </div>
           )}
@@ -165,7 +166,7 @@ export function Encyclopedia({ slug }: { slug?: string }) {
           {groups.map((group) => (
           <section key={group.label ?? "all"} className="mb-4 last:mb-0">
             {group.label && <h2 className="label-caps mb-2 text-foreground">{group.label}</h2>}
-            <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-4">
+            <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-[repeat(auto-fill,69px)]">
             {group.heroes.map((c) => {
               const active = selected?.id === c.id;
               return (

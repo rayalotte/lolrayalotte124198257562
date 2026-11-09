@@ -17,7 +17,8 @@ function uniq(list: string[]) {
 }
 
 // Narrowest side panel that still fits 4 hero icons per row (incl. padding and a scrollbar).
-const SIDEBAR_MIN_W = 400;
+const SIDEBAR_MIN_W = 368;
+const SIDEBAR_DEFAULT_W = 380;
 
 function useStoredSize(key: string, initial: number, min = 0) {
   const [size, setSize] = useState(initial);
@@ -64,7 +65,7 @@ function DragHandle({ axis, onDrag, label }: { axis: "x" | "y"; onDrag: (delta: 
 }
 
 export function Encyclopedia({ slug }: { slug?: string }) {
-  const [sidebarW, setSidebarW] = useStoredSize("codex-sidebar-w4", 420, SIDEBAR_MIN_W);
+  const [sidebarW, setSidebarW] = useStoredSize("codex-sidebar-w5", SIDEBAR_DEFAULT_W, SIDEBAR_MIN_W);
   const [filtersH, setFiltersH] = useStoredSize("codex-filters-h2", 0);
   const filtersRef = useRef<HTMLDivElement>(null);
   const { data: chars, isLoading, error } = useQuery(charactersQuery);
